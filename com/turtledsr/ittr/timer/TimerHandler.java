@@ -1,4 +1,4 @@
-package timer;
+package com.turtledsr.ittr.timer;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -10,21 +10,16 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class TimerHandler {
-  public static int reconnectionInterval = 500;
+public final class TimerHandler {
+  public static final int reconnectionInterval = 500;
+  public static Socket socket;
 
   private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
-  private Socket socket;
+  private static PrintWriter out;
+  private static BufferedReader in;
 
-  private PrintWriter out;
-  private BufferedReader in;
-
-  public TimerHandler() throws Exception {
-    connect();
-  }
-
-  public void connect() {
+  public static void connect() {
     try{
       socket = new Socket("localhost", 16834);
       out = new PrintWriter(socket.getOutputStream(), true);
@@ -35,7 +30,7 @@ public class TimerHandler {
     }
   }
 
-  public void scheduleReconnect(int time) {
+  public static void scheduleReconnect(int time) {
     executor.schedule(new Runnable() {
       @Override
       public void run() {
@@ -52,7 +47,7 @@ public class TimerHandler {
     System.out.println("Scheduling reconnection attempt in " + time + "ms");
   }
 
-  public String GetCurrentSplitName() {
+  public static String GetCurrentSplitName() {
     out.print("getcurrentsplitname\r\n");
     out.flush();
 
