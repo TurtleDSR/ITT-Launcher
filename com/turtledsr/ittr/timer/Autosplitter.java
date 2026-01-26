@@ -364,8 +364,13 @@ public final class Autosplitter {
     return true;
   }
 
-  @Deprecated
   private static boolean reset() { //unimplemented
+    //if (!checkpointString.equals(checkpointStringOld) || isLoading && !isLoadingOld) {
+		//  if (checkpointString.equals("Awakening_Start")) {
+		//  	return true;
+    //  }
+	  //}
+
     return false;
   }
 
@@ -396,7 +401,7 @@ public final class Autosplitter {
 	  }
 
 	  if (!lastCutsceneOld.equals(lastCutscene)) {
-	  	if (lastCutscene.equals("CS_Music_Attic_Stage_ClimacticKiss")) {// Ending split, always active.
+	  	if (lastCutscene.equals("CS_Music_Attic_Stage_ClimacticKiss")) { // Ending split, always active.
 	  		return true;
       }
 
