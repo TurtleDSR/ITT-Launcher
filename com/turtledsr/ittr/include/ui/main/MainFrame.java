@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 
 import com.turtledsr.ittr.include.ui.debug.LogPanel;
 import com.turtledsr.ittr.include.ui.helper.StyleManager;
-import com.turtledsr.ittr.include.ui.main.title.TitleBar;
+import com.turtledsr.ittr.include.ui.main.titleBar.TitleBar;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

@@ -1,3 +1,7 @@
+/*
+Manages and stores style information
+*/
+
 package com.turtledsr.ittr.include.ui.helper;
 
 import java.awt.Color;

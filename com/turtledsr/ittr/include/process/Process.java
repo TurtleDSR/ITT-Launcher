@@ -1,3 +1,7 @@
+/*
+Helper class for managing processes
+*/
+
 package com.turtledsr.ittr.include.process;
 
 import java.util.OptionalInt;

@@ -1,27 +1,32 @@
-package com.turtledsr.ittr.include.ui.main.title;
+/*
+Button used in the title bar to minimise the application
+*/
+
+package com.turtledsr.ittr.include.ui.main.titleBar;
 
 import java.awt.Dimension;
-import java.awt.event.MouseAdapter;
+import java.awt.Frame;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseAdapter;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
-import com.turtledsr.ittr.include.engine.Logs;
+import com.turtledsr.ittr.Main;
 import com.turtledsr.ittr.include.ui.helper.ImageManager;
 import com.turtledsr.ittr.include.ui.helper.StyleManager;
 
-public final class ExitButton extends JButton {
-  public ExitButton() {
+public final class MinimiseButton extends JButton {
+  public MinimiseButton() {
     if(ImageManager.app_close != null) {
-      ImageIcon closeIcon = new ImageIcon(ImageManager.app_close, "app_close");
+      ImageIcon closeIcon = new ImageIcon(ImageManager.app_minimise, "app_minimise");
       setIcon(closeIcon);
 
       setFocusable(false);
+      setContentAreaFilled(false);
 
       setPreferredSize(new Dimension(35, 35));
 
-      setContentAreaFilled(false);
       setOpaque(true);
       setBackground(StyleManager.titleColor);
       setBorder(null);
@@ -29,7 +34,7 @@ public final class ExitButton extends JButton {
       addMouseListener(new MouseAdapter() {
         @Override
         public void mouseEntered(MouseEvent e) {
-          setBackground(StyleManager.app_exit_red);
+          setBackground(StyleManager.titleAccent);
         }
 
         @Override
@@ -38,13 +43,12 @@ public final class ExitButton extends JButton {
         }
 
         @Override
-        public void mouseClicked(MouseEvent e) {
-          Logs.log("CLOSING APPLICATION", "EXITBUTTON");
-          System.exit(0);
+        public void mousePressed(MouseEvent e) {
+          Main.mainFrame.setState(Frame.ICONIFIED);
         }
       });
     } else {
-      setText("app_exit");
+      setText("app_minimise");
     }
   }
 }

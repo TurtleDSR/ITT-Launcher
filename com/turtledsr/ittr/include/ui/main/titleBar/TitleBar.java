@@ -1,4 +1,8 @@
-package com.turtledsr.ittr.include.ui.main.title;
+/*
+Title Bar UI Panel
+*/
+
+package com.turtledsr.ittr.include.ui.main.titleBar;
 
 import java.awt.Dimension;
 import java.awt.Font;

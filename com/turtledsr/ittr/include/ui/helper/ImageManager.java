@@ -1,3 +1,7 @@
+/*
+Imports all the images and stores them in public memory
+*/
+
 package com.turtledsr.ittr.include.ui.helper;
 
 import java.awt.Image;
