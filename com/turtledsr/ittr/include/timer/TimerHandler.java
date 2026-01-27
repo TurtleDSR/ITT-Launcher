@@ -1,4 +1,10 @@
-package com.turtledsr.ittr.timer;
+/*
+Handles the socket connection between ITTR and Livesplit
+
+Connects to the Livesplit TCP socket to control the timer
+*/
+
+package com.turtledsr.ittr.include.timer;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -10,10 +16,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import com.turtledsr.ittr.Main;
+import com.turtledsr.ittr.include.engine.Logs;
+
 public final class TimerHandler {
   public static boolean awaitingReconnection = false; 
 
-  public static final int reconnectionInterval = 500;
   public static Socket socket;
 
   private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
@@ -34,8 +42,8 @@ public final class TimerHandler {
 
       awaitingReconnection = false;
     } catch(Exception e) {
-      System.err.println(e.getMessage());
-      scheduleReconnect(reconnectionInterval);
+      Logs.logError(e.getMessage(), "TIMERHANDLER");
+      scheduleReconnect(Main.RECONNECTION_INTERVAL);
     }
   }
 
@@ -52,11 +60,12 @@ public final class TimerHandler {
           }
           connect();
         } catch(Exception e) {
-          System.err.println(e.getMessage());
+          Logs.logError(e.getMessage(), "TIMERHANDLER");
         }
       }
     }, time, TimeUnit.MILLISECONDS);
-    System.out.println("Scheduling reconnection attempt in " + time + "ms");
+    System.out.println("[TimerHandler]: Scheduling reconnection attempt in " + time + "ms");
+    Logs.log("Scheduling reconnection attempt in " + time + "ms", "TIMERHANDLER");
   }
 
   public static int getCurrentIndex() {
@@ -72,7 +81,7 @@ public final class TimerHandler {
     try{
       split = Integer.parseInt(in.readLine());
     } catch (Exception e) {
-      System.err.println(e.getMessage());
+      Logs.logError(e.getMessage(), "TIMERHANDLER");
     }
 
     return split;
@@ -81,7 +90,7 @@ public final class TimerHandler {
   public static void split() {
     if(out == null) return;
 
-    System.out.println("SPLITTING");
+    Logs.log("SPLITTING", "TIMERHANDLER");
 
     out.print("split\r\n");
     out.flush();
@@ -92,7 +101,7 @@ public final class TimerHandler {
   public static void unsplit() {
     if(out == null) return;
 
-    System.out.println("UNSPLITTING");
+    Logs.log("UNSPLITTING", "TIMERHANDLER");
 
     out.print("unsplit\r\n");
     out.flush();
@@ -103,7 +112,7 @@ public final class TimerHandler {
   public static void start() {
     if(out == null) return;
 
-    System.out.println("STARTING");
+    Logs.log("STARTING", "TIMERHANDLER");
 
     out.print("starttimer\r\n");
     out.flush();
@@ -114,7 +123,7 @@ public final class TimerHandler {
   public static void pause() {
     if(out == null) return;
 
-    System.out.println("PAUSING");
+    Logs.log("PAUSING", "TIMERHANDLER");
 
     out.print("pause\r\n");
     out.flush();
@@ -125,7 +134,7 @@ public final class TimerHandler {
   public static void pauseGameTime() {
     if(out == null) return;
 
-    System.out.println("PAUSING GAMETIME");
+    Logs.log("PAUSING GAMETIME", "TIMERHANDLER");
 
     out.print("pausegametime\r\n");
     out.flush();
@@ -136,7 +145,7 @@ public final class TimerHandler {
   public static void unpauseGameTime() {
     if(out == null) return;
 
-    System.out.println("UNPAUSING GAMETIME");
+    Logs.log("UNPAUSING GAMETIME", "TIMERHANDLER");
 
     out.print("unpausegametime\r\n");
     out.flush();
@@ -147,7 +156,7 @@ public final class TimerHandler {
   public static void reset() {
     if(out == null) return;
 
-    System.out.println("RESETTING");
+    Logs.log("RESETTING", "TIMERHANDLER");
 
     out.print("reset\r\n");
     out.flush();

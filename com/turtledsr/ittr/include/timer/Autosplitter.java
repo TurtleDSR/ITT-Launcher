@@ -1,29 +1,38 @@
-package com.turtledsr.ittr.timer;
+/*
+Emulates the autosplitter written by Lemuura (without debug or settings)
+
+Uses the JNA library for memory handling
+Uses TimerHandler for control over the livesplit timer
+
+Assumes latest version of the game
+
+*HUGE credit to Lemuura*
+*/
+
+package com.turtledsr.ittr.include.timer;
 
 import java.util.OptionalInt;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
-import com.turtledsr.ittr.process.Process;
+import com.turtledsr.ittr.Main;
+import com.turtledsr.ittr.include.engine.Logs;
+import com.turtledsr.ittr.include.process.Process;
 
-/*
-Emulates the autosplitter written by Lemuura (without debug or settings)
 
-Uses the JNA library for memory handling
-Connects to the Livesplit TCP socket to control the timer
-
-Assumes latest version of the game
-
-*HUGE credit to Lemuura*
-*/
 public final class Autosplitter {
   public static final int PROCESS_VM_READ = 0x0010;
 
   private static Kernel32 kernel32 = Native.load("kernel32", Kernel32.class);
   public static HANDLE process;
+  public static boolean awaitingReconnection = false;
+  private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
   private static boolean started = false;
   private static boolean running = false;
@@ -42,18 +51,18 @@ public final class Autosplitter {
 	private static String checkpointString = "";      //"ItTakesTwo.exe", 0x07A07A60, 0x180, 0x368, 0x8, 0x1d8, 0x0;
   private static String checkpointStringOld = "";
   private static final long[] checkpointStringPath = {0x180, 0x368, 0x8, 0x1d8, 0x0};
-	private static String chapterString = "";         //"ItTakesTwo.exe", 0x07A07A60, 0x180, 0x368, 0x8, 0x1e8, 0x0;
-  private static String chapterStringOld = "";
-  private static final long[] chapterStringPath = {0x180, 0x368, 0x8, 0x1e8, 0x0};
+	//private static String chapterString = "";         //"ItTakesTwo.exe", 0x07A07A60, 0x180, 0x368, 0x8, 0x1e8, 0x0;
+  //private static String chapterStringOld = "";
+  //private static final long[] chapterStringPath = {0x180, 0x368, 0x8, 0x1e8, 0x0};
 	private static String subchapterString = "";      //"ItTakesTwo.exe", 0x07A07A60, 0x180, 0x368, 0x8, 0x1f8, 0x0;
   private static String subchapterStringOld = "";
   private static final long[] subchapterStringPath = {0x180, 0x368, 0x8, 0x1f8, 0x0};
 	private static String cutsceneString = "";        //"ItTakesTwo.exe", 0x07A07A60, 0x180, 0x2b0, 0x0, 0x390, 0x2a0, 0x788, 0x0;
-  private static String cutsceneStringOld = "";
+  //private static String cutsceneStringOld = "";
   private static final long[] cutsceneStringPath = {0x180, 0x2b0, 0x0, 0x390, 0x2a0, 0x788, 0x0};
-	private static boolean skippable = false;         //"ItTakesTwo.exe", 0x07A07A60, 0x180, 0x2b0, 0x0, 0x390, 0x318;
-  private static boolean skippableOld = false;
-  private static final long[] skippablePath = {0x180, 0x2b0, 0x0, 0x390, 0x318};
+	//private static boolean skippable = false;         //"ItTakesTwo.exe", 0x07A07A60, 0x180, 0x2b0, 0x0, 0x390, 0x318;
+  //private static boolean skippableOld = false;
+  //private static final long[] skippablePath = {0x180, 0x2b0, 0x0, 0x390, 0x318};
 
   //VARS
   private static String lastCutscene = "";
@@ -193,26 +202,44 @@ public final class Autosplitter {
 
   private static final String[] nextLoadSplits = {};
 
-  public static void run() throws Exception {
-    OptionalInt pid = Process.getProcessPID("ItTakesTwo");
-    if(!pid.isPresent()) {
-      throw new Exception("Process Not Found");
+  public static void bind() {
+    try{
+      OptionalInt pid = Process.getProcessPID("ItTakesTwo");
+      if(!pid.isPresent()) {
+        throw new Exception("Process Not Found");
+      }
+
+      process = kernel32.OpenProcess(PROCESS_VM_READ, false, pid.getAsInt());
+
+      baseAddress = Process.getProcessBaseAddress(pid.getAsInt());
+      if(baseAddress == 0) {
+        throw new Exception("Address Not Found");
+      }
+
+      basePointer = new Pointer(baseAddress);
+
+      running = true;
+      awaitingReconnection = false;
+    } catch(Exception e) {
+      Logs.logError(e.getMessage(), "AUTOSPLITTER");
+      scheduleBind(Main.RECONNECTION_INTERVAL);
     }
+  }
 
-    process = kernel32.OpenProcess(PROCESS_VM_READ, false, pid.getAsInt());
-
-    baseAddress = Process.getProcessBaseAddress(pid.getAsInt());
-    if(baseAddress == 0) {
-      throw new Exception("Address Not Found");
-    }
-
-    basePointer = new Pointer(baseAddress);
-
-    running = true;
+   public static void scheduleBind(int time) {
+    awaitingReconnection = true;
+    executor.schedule(new Runnable() {
+      @Override
+      public void run() {
+        bind();
+      }
+    }, time, TimeUnit.MILLISECONDS);
+    Logs.log("Scheduling bind attempt in " + time + "ms", "AUTOSPLITTER");
   }
 
   public static void stop() {
-    System.err.println("AUTOSPLITTER");
+    Logs.logError("STOPPED", "AUTOSPLITTER");
+    
     kernel32.CloseHandle(process);
     running = false;
 
@@ -266,10 +293,10 @@ public final class Autosplitter {
     isLoadingOld = isLoading;
     levelStringOld = levelString;
     checkpointStringOld = checkpointString;
-    chapterStringOld = chapterString;
+    //chapterStringOld = chapterString;
     subchapterStringOld = subchapterString;
-    cutsceneStringOld = cutsceneString;
-    skippableOld = skippable;
+    //cutsceneStringOld = cutsceneString;
+    //skippableOld = skippable;
 
     //UPDATE CURRENT STATE
     //ISLOADING
@@ -279,7 +306,7 @@ public final class Autosplitter {
     } else {
       isLoading = mIsLoading.getByte(0) != 0;
     }
-    //System.out.println(isLoading);
+    //Logs.log(isLoading, "AUTOSPLITTER");
 
     //LEVELSTRING
     Memory mLevelString = followPath(levelStringPath, 128);
@@ -288,7 +315,7 @@ public final class Autosplitter {
     } else {
       levelString = mLevelString.getWideString(0);
     }
-    //System.out.println(levelString);
+    //Logs.log(levelString, "AUTOSPLITTER");
 
     //CHECKPOINTSTRING
     Memory mCheckpointString = followPath(checkpointStringPath, 128);
@@ -297,16 +324,16 @@ public final class Autosplitter {
     } else {
       checkpointString = mCheckpointString.getWideString(0);
     }
-    //System.out.println(checkpointString);
+    //Logs.log(checkpointString, "AUTOSPLITTER");
 
     //CHAPTERSTRING
-    Memory mChapterString = followPath(chapterStringPath, 128);
-    if(mChapterString == null) {
-      chapterString = null;
-    } else {
-      chapterString = mChapterString.getWideString(0);
-    }
-    //System.out.println(chapterString);
+    //Memory mChapterString = followPath(chapterStringPath, 128);
+    //if(mChapterString == null) {
+    //  chapterString = null;
+    //} else {
+    //  chapterString = mChapterString.getWideString(0);
+    //}
+    //Logs.log(chapterString, "AUTOSPLITTER");
 
     //SUBCHAPTERSTRING
     Memory mSubchapterString = followPath(subchapterStringPath, 128);
@@ -315,7 +342,7 @@ public final class Autosplitter {
     } else {
       subchapterString = mSubchapterString.getWideString(0);
     }
-    //System.out.println(subchapterString);
+    //Logs.log(subchapterString, "AUTOSPLITTER");
 
     //CUTSCENESTRING
     Memory mCutsceneString = followPath(cutsceneStringPath, 128);
@@ -324,16 +351,16 @@ public final class Autosplitter {
     } else {
       cutsceneString = mCutsceneString.getWideString(0);
     }
-    //System.out.println(cutsceneString);
+    //Logs.log(cutsceneString, "AUTOSPLITTER");
 
     //SKIPPABLE
-    Memory mSkippable = followPath(skippablePath, 128);
-    if(mSkippable == null) {
-      skippable = false;
-    } else {
-      skippable = mSkippable.getByte(0) > 0;
-    }
-    //System.out.println(skippable);
+    //Memory mSkippable = followPath(skippablePath, 128);
+    //if(mSkippable == null) {
+    //  skippable = false;
+    //} else {
+    //  skippable = mSkippable.getByte(0) > 0;
+    //}
+    //Logs.log(skippable, "AUTOSPLITTER");
   }
 
   //TIMER CONTROL
@@ -344,16 +371,22 @@ public final class Autosplitter {
 
     if(!timerSplit && splitIndexOld != splitIndex) {
       if(splitIndex == -1) {
+        Logs.log("Player forfeit", "AUTOSPLITTER");
         //player reset [HANDLE FORFEIT]
         started = false;
+        return false;
       }
 
+      Logs.log("Player split manually", "AUTOSPLITTER");
       TimerHandler.unsplit();
+      Logs.log("Manual split corrected", "AUTOSPLITTER");
+      splitIndex = TimerHandler.getCurrentIndex();
       return false;
     }
 
     if(splitIndex == -1) {
       if(timerSplit) {
+        Logs.log("Player Finished", "AUTOSPLITTER");
         //player completed [HANDLE COMPLETION]
       }
     }
@@ -361,6 +394,7 @@ public final class Autosplitter {
     lastCutsceneOld = lastCutscene;
     if (cutsceneString == null) lastCutscene = "null";
 	  if (cutsceneString != null && cutsceneString.length() > 1) lastCutscene = cutsceneString;
+    timerSplit = false;
     return true;
   }
 

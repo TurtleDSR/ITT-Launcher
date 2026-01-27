@@ -1,4 +1,4 @@
-package com.turtledsr.ittr.process;
+package com.turtledsr.ittr.include.process;
 
 import java.util.OptionalInt;
 import java.util.function.Predicate;
@@ -10,7 +10,7 @@ import com.sun.jna.platform.win32.Tlhelp32;
 import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 
-public class Process {
+public final class Process {
   public static OptionalInt getProcessPID(String processName) {
     return getProcessPID(processName, true);
   }
