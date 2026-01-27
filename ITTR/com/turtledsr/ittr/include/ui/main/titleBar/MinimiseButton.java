@@ -21,34 +21,32 @@ public final class MinimiseButton extends JButton {
     if(ImageManager.app_close != null) {
       ImageIcon closeIcon = new ImageIcon(ImageManager.app_minimise, "app_minimise");
       setIcon(closeIcon);
-
-      setFocusable(false);
-      setContentAreaFilled(false);
-
-      setPreferredSize(new Dimension(35, 35));
-
-      setOpaque(true);
-      setBackground(StyleManager.titleColor);
-      setBorder(null);
-
-      addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseEntered(MouseEvent e) {
-          setBackground(StyleManager.titleAccent);
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-          setBackground(StyleManager.titleColor);
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-          Main.mainFrame.setState(Frame.ICONIFIED);
-        }
-      });
     } else {
       setText("app_minimise");
     }
+
+    setFocusable(false);
+
+    setPreferredSize(new Dimension(StyleManager.TITLEBAR_HEIGHT, StyleManager.TITLEBAR_HEIGHT));
+    
+    setContentAreaFilled(false);
+    setOpaque(true);
+    setBackground(StyleManager.titleColor);
+    setBorder(null);
+
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseEntered(MouseEvent e) {
+        setBackground(StyleManager.titleAccent);
+      }
+      @Override
+      public void mouseExited(MouseEvent e) {
+        setBackground(StyleManager.titleColor);
+      }
+      @Override
+      public void mousePressed(MouseEvent e) {
+        Main.mainFrame.setState(Frame.ICONIFIED);
+      }
+    });
   }
 }

@@ -64,7 +64,6 @@ public final class TimerHandler {
         }
       }
     }, time, TimeUnit.MILLISECONDS);
-    System.out.println("[TimerHandler]: Scheduling reconnection attempt in " + time + "ms");
     Logs.log("Scheduling reconnection attempt in " + time + "ms", "TIMERHANDLER");
   }
 

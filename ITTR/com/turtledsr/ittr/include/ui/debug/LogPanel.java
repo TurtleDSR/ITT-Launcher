@@ -51,7 +51,9 @@ public final class LogPanel extends JPanel {
     add(Box.createHorizontalStrut(600), c);
 
     JLabel label = new JLabel("Logs:");
-    label.setFont(FontManager.poppins.deriveFont(30.0f));
+    if(FontManager.poppins != null) {
+      label.setFont(FontManager.poppins.deriveFont(30.0f));
+    }
     label.setForeground(StyleManager.foregroundColor);
 
     add(label, c);

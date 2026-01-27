@@ -28,7 +28,7 @@ public final class TitleBar extends JPanel {
 
   public TitleBar() {
     super(new GridBagLayout());
-    setPreferredSize(new Dimension(610, 35));
+    setPreferredSize(new Dimension(610, StyleManager.TITLEBAR_HEIGHT));
     setBackground(StyleManager.titleColor);
 
     GridBagConstraints c = new GridBagConstraints();
@@ -42,7 +42,9 @@ public final class TitleBar extends JPanel {
     c.gridy = 1;
 
     titleLabel = new JLabel(Main.TITLE);
-    titleLabel.setFont(FontManager.poppins.deriveFont(Font.BOLD, 20.0f));
+    if(FontManager.poppins != null) {
+      titleLabel.setFont(FontManager.poppins.deriveFont(Font.BOLD, 20.0f));
+    }
     titleLabel.setForeground(StyleManager.foregroundColor);
 
     add(titleLabel, c);

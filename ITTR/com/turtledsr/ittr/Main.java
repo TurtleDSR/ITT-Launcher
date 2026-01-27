@@ -14,6 +14,7 @@ import com.turtledsr.ittr.include.ui.main.MainFrame;
 public final class Main {
   public static final String TITLE = "It Takes Two Ranked";
   public static final float VERSION = 1.0f;
+  public static final boolean SHOW_CUSTOM_TITLEBAR = true;
 
   public static final int RECONNECTION_INTERVAL = 500;
   public static MainFrame mainFrame;
@@ -21,7 +22,7 @@ public final class Main {
   public static void main(String[] args) throws Exception {
     ImageManager.loadImages();
     FontManager.loadFonts();
-    
+
     mainFrame = new MainFrame();
 
     TimerHandler.connect();

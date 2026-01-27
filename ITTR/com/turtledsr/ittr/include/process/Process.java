@@ -13,6 +13,7 @@ import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.Tlhelp32;
 import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
+import com.turtledsr.ittr.include.engine.Logs;
 
 public final class Process {
   public static OptionalInt getProcessPID(String processName) {
@@ -46,5 +47,15 @@ public final class Process {
       Kernel32.INSTANCE.CloseHandle(snapshot);
     }
     return 0;
+  }
+
+  public static boolean launchLivesplitTimer(String chapter) { //returns status
+    try{
+      new ProcessBuilder("").start();
+      return true;
+    } catch(Exception e){
+      Logs.logError(e.getMessage(), "PROCESS");
+      return false;
+    } 
   }
 }

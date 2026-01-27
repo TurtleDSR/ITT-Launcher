@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.turtledsr.ittr.Main;
-import com.turtledsr.ittr.include.engine.Logs;
 
 public final class FontManager {
   public static final float FONT_SIZE = 14.0f;
@@ -18,18 +17,24 @@ public final class FontManager {
   public static Font poppins;
 
   public static void loadFonts() {
-    poppins = loadFontFile("assets\\font\\Poppins-Regular.ttf").deriveFont(FONT_SIZE);
+    poppins = loadFontFile("assets/font/Poppins-Regular.ttf");
+    if(poppins != null) poppins = poppins.deriveFont(FONT_SIZE);
   }
 
   private static Font loadFontFile(String path) {
     InputStream is = Main.class.getResourceAsStream(path);
 
+    if(is == null) {
+      System.err.println("[FONTMANAGER]: Font file not found: " + path);
+      return null;
+    }
+
     try {return Font.createFont(Font.TRUETYPE_FONT, is);} catch(FontFormatException e) {
-      Logs.logError("There was a problem formatting the font.", "FONTMANAGER");
-			Logs.logError(e.getMessage(), "FONTMANAGER");
+      System.err.println("[FONTMANAGER]: There was a problem formatting the font");
+      System.err.println("[FONTMANAGER]: " + e.getMessage());
     } catch (IOException e) {
-      Logs.logError("There was a problem reading the font file.", "FONTMANAGER");
-			Logs.logError(e.getMessage(), "FONTMANAGER");
+      System.err.println("[FONTMANAGER]: There was a problem loading the font file");
+      System.err.println("[FONTMANAGER]: " + e.getMessage());
     }
 
     return null;

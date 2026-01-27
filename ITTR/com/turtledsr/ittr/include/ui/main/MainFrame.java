@@ -8,6 +8,7 @@ package com.turtledsr.ittr.include.ui.main;
 
 import javax.swing.JFrame;
 
+import com.turtledsr.ittr.Main;
 import com.turtledsr.ittr.include.ui.debug.LogPanel;
 import com.turtledsr.ittr.include.ui.helper.StyleManager;
 import com.turtledsr.ittr.include.ui.main.titleBar.TitleBar;
@@ -44,11 +45,16 @@ public final class MainFrame extends JFrame {
 
     logPanel = new LogPanel();
 
-    setUndecorated(true);
     getContentPane().setBackground(StyleManager.backgroundColor);
 
-    add(titleBar, c);
-    c.gridy += 1;
+    if(Main.SHOW_CUSTOM_TITLEBAR) {
+      setUndecorated(true);
+      add(titleBar, c);
+      c.gridy += 1;
+    }
+
+    setTitle(Main.TITLE);
+
     add(logPanel, c);
 
     setResizable(false);

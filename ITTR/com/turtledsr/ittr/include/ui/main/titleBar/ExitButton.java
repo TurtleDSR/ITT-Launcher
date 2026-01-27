@@ -20,35 +20,35 @@ public final class ExitButton extends JButton {
     if(ImageManager.app_close != null) {
       ImageIcon closeIcon = new ImageIcon(ImageManager.app_close, "app_close");
       setIcon(closeIcon);
-
-      setFocusable(false);
-
-      setPreferredSize(new Dimension(35, 35));
-
-      setContentAreaFilled(false);
-      setOpaque(true);
-      setBackground(StyleManager.titleColor);
-      setBorder(null);
-
-      addMouseListener(new MouseAdapter() {
-        @Override
-        public void mouseEntered(MouseEvent e) {
-          setBackground(StyleManager.app_exit_red);
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-          setBackground(StyleManager.titleColor);
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-          Logs.log("CLOSING APPLICATION", "EXITBUTTON");
-          System.exit(0);
-        }
-      });
     } else {
       setText("app_exit");
     }
+
+    setFocusable(false);
+
+    setPreferredSize(new Dimension(StyleManager.TITLEBAR_HEIGHT, StyleManager.TITLEBAR_HEIGHT));
+
+    setContentAreaFilled(false);
+    setOpaque(true);
+    setBackground(StyleManager.titleColor);
+    setBorder(null);
+
+    addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseEntered(MouseEvent e) {
+        setBackground(StyleManager.app_exit_red);
+      }
+
+      @Override
+      public void mouseExited(MouseEvent e) {
+        setBackground(StyleManager.titleColor);
+      }
+      
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        Logs.log("CLOSING APPLICATION", "EXITBUTTON");
+        System.exit(0);
+      }
+    });
   }
 }
