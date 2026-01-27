@@ -10,7 +10,6 @@ import javax.swing.JButton;
 import com.turtledsr.ittr.include.engine.Logs;
 import com.turtledsr.ittr.include.ui.helper.ImageManager;
 import com.turtledsr.ittr.include.ui.helper.StyleManager;
-import com.turtledsr.ittr.include.ui.main.MainFrame;
 
 public final class ExitButton extends JButton {
   public ExitButton() {
@@ -20,11 +19,7 @@ public final class ExitButton extends JButton {
 
       setFocusable(false);
 
-      if(MainFrame.titleBar != null) {
-        setPreferredSize(new Dimension(MainFrame.titleBar.getHeight() + 5, MainFrame.titleBar.getHeight()));
-      } else {
-        setPreferredSize(new Dimension(45, 40));
-      }
+      setPreferredSize(new Dimension(35, 35));
 
       setContentAreaFilled(false);
       setOpaque(true);

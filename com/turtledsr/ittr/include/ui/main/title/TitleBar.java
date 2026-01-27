@@ -24,7 +24,7 @@ public final class TitleBar extends JPanel {
 
   public TitleBar() {
     super(new GridBagLayout());
-    setPreferredSize(new Dimension(610, 40));
+    setPreferredSize(new Dimension(610, 35));
     setBackground(StyleManager.titleColor);
 
     GridBagConstraints c = new GridBagConstraints();

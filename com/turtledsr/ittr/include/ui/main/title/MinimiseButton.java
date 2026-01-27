@@ -11,7 +11,6 @@ import javax.swing.JButton;
 import com.turtledsr.ittr.Main;
 import com.turtledsr.ittr.include.ui.helper.ImageManager;
 import com.turtledsr.ittr.include.ui.helper.StyleManager;
-import com.turtledsr.ittr.include.ui.main.MainFrame;
 
 public final class MinimiseButton extends JButton {
   public MinimiseButton() {
@@ -21,12 +20,8 @@ public final class MinimiseButton extends JButton {
 
       setFocusable(false);
       setContentAreaFilled(false);
-      
-      if(MainFrame.titleBar != null) {
-        setPreferredSize(new Dimension(MainFrame.titleBar.getHeight(), MainFrame.titleBar.getHeight()));
-      } else {
-        setPreferredSize(new Dimension(40, 40));
-      }
+
+      setPreferredSize(new Dimension(35, 35));
 
       setOpaque(true);
       setBackground(StyleManager.titleColor);

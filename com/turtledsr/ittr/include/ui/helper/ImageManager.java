@@ -16,8 +16,8 @@ public final class ImageManager {
   public static Image app_minimise;
 
   public static void loadImages() {
-    app_close = loadImageFile("assets\\img\\app_close.png").getScaledInstance(35, 35, 0);
-    app_minimise = loadImageFile("assets\\img\\app_minimise.png").getScaledInstance(35, 6, 0);
+    app_close = loadImageFile("assets\\img\\app_close.png").getScaledInstance(31, 31, 0);
+    app_minimise = loadImageFile("assets\\img\\app_minimise.png").getScaledInstance(30, 6, 0);
   }
 
   private static Image loadImageFile(String path) {
