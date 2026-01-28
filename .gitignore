@@ -4,3 +4,4 @@
 BUILD/
 timer/
 run.bat
+gradle.properties
