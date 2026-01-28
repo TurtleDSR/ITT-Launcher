@@ -2,4 +2,4 @@
 .github/
 BUILD/
 run.bat
-ITTR.jar
+*.jar
