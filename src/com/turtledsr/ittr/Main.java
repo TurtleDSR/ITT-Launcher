@@ -34,6 +34,8 @@ public final class Main {
     TimerHandler.connect();
     Autosplitter.bind();
 
+    Process.launchLivesplitTimer("snowglobe");
+
     //update log panel to have correct style
     LogPanel.updateStyle();
 

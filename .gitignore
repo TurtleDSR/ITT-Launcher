@@ -1,5 +1,6 @@
 .vscode/
 .github/
 BUILD/
+timer/
 run.bat
 *.jar
