@@ -10,7 +10,6 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
-import com.turtledsr.ittr.Main;
 import com.turtledsr.ittr.include.engine.Logs;
 
 public final class ImageManager {
@@ -20,15 +19,15 @@ public final class ImageManager {
   public static Image app_minimise;
 
   public static void loadImages() {
-    app_close = loadImageFile("assets/img/app_close.png");
+    app_close = loadImageFile("img/app_close.png");
     if(app_close != null) app_close = app_close.getScaledInstance(StyleManager.TITLEBAR_HEIGHT - 4, StyleManager.TITLEBAR_HEIGHT - 4, 0);
 
-    app_minimise = loadImageFile("assets/img/app_minimise.png");
+    app_minimise = loadImageFile("img/app_minimise.png");
     if(app_minimise != null) app_minimise = app_minimise.getScaledInstance(StyleManager.TITLEBAR_HEIGHT - 5, (StyleManager.TITLEBAR_HEIGHT - 5) / 6, 0);
   }
 
   private static Image loadImageFile(String path) {
-    InputStream is = Main.class.getResourceAsStream(path);
+    InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
 
     if(is == null) {
       Logs.logError("Image file not found: " + path, "IMAGE_MANAGER");

@@ -13,6 +13,7 @@ import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.Tlhelp32;
 import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
+
 import com.turtledsr.ittr.include.engine.LivesplitManager;
 import com.turtledsr.ittr.include.engine.Logs;
 

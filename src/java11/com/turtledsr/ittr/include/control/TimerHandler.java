@@ -4,7 +4,7 @@ Handles the socket connection between ITTR and Livesplit
 Connects to the Livesplit TCP socket to control the timer
 */
 
-package com.turtledsr.ittr.include.timer;
+package com.turtledsr.ittr.include.control;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

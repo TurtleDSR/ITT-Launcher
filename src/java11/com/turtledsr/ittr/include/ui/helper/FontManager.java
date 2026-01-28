@@ -9,7 +9,6 @@ import java.awt.FontFormatException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.turtledsr.ittr.Main;
 import com.turtledsr.ittr.include.engine.Logs;
 
 public final class FontManager {
@@ -18,12 +17,12 @@ public final class FontManager {
   public static Font poppins;
 
   public static void loadFonts() {
-    poppins = loadFontFile("assets/font/Poppins-Regular.ttf");
+    poppins = loadFontFile("font/Poppins-Regular.ttf");
     if(poppins != null) poppins = poppins.deriveFont(FONT_SIZE);
   }
 
   private static Font loadFontFile(String path) {
-    InputStream is = Main.class.getResourceAsStream(path);
+    InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
 
     if(is == null) {
       Logs.logError("Font file not found: " + path, "FONT_MANAGER");

@@ -9,7 +9,7 @@ Assumes latest version of the game
 *HUGE credit to Lemuura*
 */
 
-package com.turtledsr.ittr.include.timer;
+package com.turtledsr.ittr.include.control;
 
 import java.util.OptionalInt;
 import java.util.concurrent.Executors;
@@ -21,6 +21,7 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
+
 import com.turtledsr.ittr.Main;
 import com.turtledsr.ittr.include.engine.Logs;
 import com.turtledsr.ittr.include.process.Process;

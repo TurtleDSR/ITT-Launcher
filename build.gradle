@@ -1,0 +1,51 @@
+plugins {
+  id 'java'
+}
+
+java {
+  toolchain { languageVersion = JavaLanguageVersion.of(11) }
+}
+
+sourceSets {
+  java11 {
+    java { srcDirs = ['src/java11'] }
+    resources { srcDirs = ['src/java11/resources'] }
+  }
+  main {
+    java { srcDirs = ['src/main'] }
+  }
+}
+
+dependencies {
+  implementation fileTree(dir: 'lib', include: ['*.jar'])
+  java11Implementation fileTree(dir: 'lib', include: ['*.jar'])
+}
+
+tasks.named('compileJava') {
+  options.release = 8
+}
+
+tasks.named('compileJava11Java') {
+  options.release = 11
+}
+
+tasks.named('processJava11Resources') {
+  filesMatching(['**/*.ttf', '**/*.otf', '**/*.zip']) {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+  }
+}
+
+jar {
+  manifest {
+    attributes('Multi-Release': 'true', 'Main-Class': 'com.turtledsr.ittr.Main')
+  }
+  into('META-INF/versions/11') {
+    from sourceSets.java11.output
+  }
+
+  from {
+    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+  } {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  }
+}

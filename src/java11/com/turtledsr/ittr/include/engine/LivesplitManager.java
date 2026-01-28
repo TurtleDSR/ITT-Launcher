@@ -30,7 +30,7 @@ public class LivesplitManager {
     }
 
     Logs.log("timer folder does not exist, extracting", "LIVESPLIT_MANAGER");
-    InputStream in = Main.class.getResourceAsStream("timer.zip");
+    InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("timer.zip");
 
     if(in == null) {
       Logs.logError("Could not find ZIP file", "LIVESPLIT_MANAGER");
