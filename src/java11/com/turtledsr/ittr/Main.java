@@ -26,7 +26,7 @@ public final class Main {
 
   public static void main(String[] args) throws Exception {
     if(!checkVersion()) {
-      JOptionPane.showMessageDialog(null, "[ERROR]: Invalid java version, please use Java 11+");
+      JOptionPane.showMessageDialog(null, "[ERROR]: Invalid Java version, please use Java 11+");
       return;
     }
 
