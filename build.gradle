@@ -37,7 +37,7 @@ tasks.named('processJava11Resources') {
 
 jar {
   manifest {
-    attributes('Multi-Release': 'true', 'Main-Class': 'com.turtledsr.ittr.Main')
+    attributes('Multi-Release': 'true', 'Main-Class': 'com.turtledsr.launcher.Main')
   }
   into('META-INF/versions/11') {
     from sourceSets.java11.output

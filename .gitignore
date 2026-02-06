@@ -2,6 +2,6 @@
 .github/
 .gradle/
 BUILD/
-timer/
+bin/
 run.bat
 gradle.properties
