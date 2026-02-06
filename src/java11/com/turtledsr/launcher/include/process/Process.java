@@ -4,17 +4,22 @@ Helper class for managing processes and similar low level machine control
 
 package com.turtledsr.launcher.include.process;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.OptionalInt;
 import java.util.Scanner;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.swing.SwingWorker;
@@ -35,6 +40,8 @@ import com.turtledsr.launcher.include.ui.main.launcher.ModsPanel;
 import com.turtledsr.launcher.include.ui.main.launcher.ToggleModsButton;
 
 public final class Process {
+  private static String gameDirectory;
+
   public static OptionalInt getProcessPID(String processName) {
     return getProcessPID(processName, true);
   }
@@ -137,20 +144,47 @@ public final class Process {
   }
 
   public static String getGameDirectory() { //returns the directory of It Takes Two
-    try {
-      if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam")) {
-        return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam",
-            "InstallPath") + "/steamapps/common/ItTakesTwo/";
-      }
+    if(gameDirectory == null) {
+      try {
+        String steamDirectory;
 
-      return Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Valve\\Steam", "InstallPath")
-          + "/steamapps/common/ItTakesTwo/";
-    } catch (Exception e) {
-      Logs.logError("CANNOT READ STEAMDIR REGISTRY", "PROCESS");
-      Logs.logError(e.getMessage(), "PROCESS");
-      Main.lockQueue = true;
-      return null;
+        if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam")) {
+          steamDirectory = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
+        }
+
+        steamDirectory = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Valve\\Steam", "InstallPath");
+
+        List<String> libraryPaths = new ArrayList<>();
+        File vdfFile = new File(steamDirectory, "steamapps/libraryfolders.vdf");
+          
+        try(BufferedReader reader = new BufferedReader(new FileReader(vdfFile))) {
+          String line;
+          Pattern pathPattern = Pattern.compile("\"path\"\\s*\"([^\"]+)\"");
+          
+          while ((line = reader.readLine()) != null) {
+            Matcher matcher = pathPattern.matcher(line);
+            if (matcher.find()) {
+              String path = matcher.group(1).replace("\\\\", "\\");
+              libraryPaths.add(path);
+            }
+          }
+
+          for(int i = 0; i < libraryPaths.size(); i++) {
+            gameDirectory = libraryPaths.get(i) + "/steamapps/common/ItTakesTwo/";
+            if(new File(gameDirectory).isDirectory()) {
+              return gameDirectory;
+            }
+          }
+        }
+      } catch (Exception e) {
+        Logs.logError("CANNOT READ STEAMDIR REGISTRY", "PROCESS");
+        Logs.logError(e.getMessage(), "PROCESS");
+        Main.lockQueue = true;
+        gameDirectory = null;
+      }
     }
+
+    return gameDirectory;
   }
 
   public static ArrayList<Mod> getModList() {
@@ -186,8 +220,9 @@ public final class Process {
         Logs.log("Found mod: " + name, "PROCESS");
 
         if (extension.equalsIgnoreCase("zip")) {
-          if (!(name.equals("Default") || name.equals("Backup")))
+          if (!(name.equals("Default") || name.equals("Backup") ||  name.equals("Default-Game-Backup"))) {
             directory.add(new Mod(name)); //check if zip is default scripts folder
+          }
         }
       }
 
