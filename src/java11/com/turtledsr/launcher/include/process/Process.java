@@ -335,7 +335,7 @@ public final class Process {
 
   public static void installMod(InputStream stream) {
     try {
-      ZipManager.extractFromStream(stream, getGameDirectory() + "Nuts/Script/");
+      ZipManager.extractFromStream(stream, getGameDirectory() + "Nuts/Script/", getGameDirectory() + "Nuts/Script/Speed/SpeedSettings.as");
     } catch (Exception e) {
       Logs.logError("could not install mod: " + e.getMessage(), "PROCESS");
     }

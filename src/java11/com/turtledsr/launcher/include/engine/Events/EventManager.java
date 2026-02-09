@@ -2,7 +2,7 @@
 Handles events for the whole system
 */
 
-package com.turtledsr.launcher.include.engine.Events;
+package com.turtledsr.launcher.include.engine.events;
 
 import java.util.ArrayList;
 

@@ -17,8 +17,8 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 import com.turtledsr.launcher.Main;
-import com.turtledsr.launcher.include.engine.Events.EventListener;
-import com.turtledsr.launcher.include.engine.Events.EventManager;
+import com.turtledsr.launcher.include.engine.events.EventListener;
+import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.process.Process;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.main.MainFrame;
@@ -77,6 +77,9 @@ public final class PanelSelector extends JPanel {
     launchGameButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        if(!launchGameButton.getText().equals("Launch")) return; //only launch when game is not already running
+
+        launchGameButton.setText("Launching...");
         Process.launchItTakesTwoEx();
       }
     });
