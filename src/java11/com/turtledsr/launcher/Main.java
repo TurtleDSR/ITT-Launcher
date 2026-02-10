@@ -83,8 +83,6 @@ public final class Main {
       }
       gameConnected = true;
     }
-
-    if(gameConnected && timerConnected) Autosplitter.tick();
   }
 
   public static InputStream getResourceAsStream(String path) {
