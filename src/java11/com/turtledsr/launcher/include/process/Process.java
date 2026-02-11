@@ -108,7 +108,7 @@ public final class Process {
 
   public static boolean launchItTakesTwo() { //returns status
     String os = System.getProperty("os.name").toLowerCase();
-    String cmd = "steam://rungameid/1426210"; //run It Takes Two command
+    String cmd = "steam://rungameid/1426210//-devmenu%20-dx12"; //run It Takes Two command
 
     try {
       if (os.contains("win")) {
