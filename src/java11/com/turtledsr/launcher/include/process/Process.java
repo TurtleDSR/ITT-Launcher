@@ -41,6 +41,7 @@ import com.turtledsr.launcher.include.ui.main.launcher.ToggleModsButton;
 
 public final class Process {
   private static String gameDirectory;
+  private static String steamDirectory;
 
   public static OptionalInt getProcessPID(String processName) {
     return getProcessPID(processName, true);
@@ -107,17 +108,13 @@ public final class Process {
   }
 
   public static boolean launchItTakesTwo() { //returns status
-    String os = System.getProperty("os.name").toLowerCase();
-    String cmd = "steam://rungameid/1426210//-devmenu%20-dx12"; //run It Takes Two command
+    if(steamDirectory == null) getSteamDirectory();
+    String appId = "1426210";
+    String launchArgs = "-devmenu -dx12";
 
     try {
-      if (os.contains("win")) {
-        new ProcessBuilder("cmd.exe", "/c", "start", cmd).start();
-      } else if (os.contains("mac")) {
-        new ProcessBuilder("open", cmd).start();
-      } else {
-        new ProcessBuilder("steam", cmd).start();
-      }
+      new ProcessBuilder(steamDirectory + "/steam.exe", "-applaunch", appId, launchArgs).start();
+
       Logs.log("Successfully launched game", "PROCESS");
       return true;
     } catch (Exception e) {
@@ -143,16 +140,21 @@ public final class Process {
     }
   }
 
+  public static String getSteamDirectory() { //returns the directory of steam
+    if(steamDirectory == null) {
+      if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam")) {
+        steamDirectory = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
+      }
+      steamDirectory = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Valve\\Steam", "InstallPath");
+    }
+
+    return steamDirectory;
+  }
+
   public static String getGameDirectory() { //returns the directory of It Takes Two
     if(gameDirectory == null) {
       try {
-        String steamDirectory;
-
-        if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam")) {
-          steamDirectory = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam", "InstallPath");
-        }
-
-        steamDirectory = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Valve\\Steam", "InstallPath");
+        if(steamDirectory == null) getSteamDirectory();
 
         List<String> libraryPaths = new ArrayList<>();
         File vdfFile = new File(steamDirectory, "steamapps/libraryfolders.vdf");
