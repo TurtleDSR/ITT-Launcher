@@ -1,9 +1,22 @@
 plugins {
   id 'java'
+  id 'application'
+  id 'org.beryx.runtime' version '1.13.1'
 }
 
 java {
   toolchain { languageVersion = JavaLanguageVersion.of(11) }
+}
+
+application {
+  mainClass = 'com.turtledsr.launcher.Main'
+}
+
+afterEvaluate {
+  runtime {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    modules = ['java.base', 'java.desktop', 'java.logging']
+  }
 }
 
 sourceSets {
@@ -48,4 +61,27 @@ jar {
   } {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   }
+}
+
+tasks.register('buildRuntime', Exec) {
+  dependsOn jar
+  
+  def jreFolder = layout.buildDirectory.dir("jre").get().asFile
+  
+  doFirst {
+    if (jreFolder.exists()) {
+      jreFolder.deleteDir()
+    }
+  }
+
+  def jlinkPath = javaToolchains.compilerFor(java.toolchain).get()
+    .metadata.installationPath.file("bin/jlink").asFile.absolutePath
+  commandLine jlinkPath, 
+    '--module-path', "${javaToolchains.compilerFor(java.toolchain).get().metadata.installationPath.asFile}/jmods",
+    '--add-modules', 'java.base,java.desktop,java.logging',
+    '--strip-debug', 
+    '--compress', '2', 
+    '--no-header-files', 
+    '--no-man-pages', 
+    '--output', jreFolder.absolutePath
 }
