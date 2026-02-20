@@ -1,12 +1,9 @@
 [windows]
-build:
-  gradle build
-  gradle buildRuntime
-  clang launch.c -o build/c/ITT-launcher.exe
+build: build-J build-C
 
 [windows]
 build-C:
-  clang launch.c -o build/c/ITT-launcher.exe
+  clang -O3 launch.c -o build/c/ITT-launcher.exe -luser32 -lshell32 -lkernel32 -static
 
 [windows]
 build-J:

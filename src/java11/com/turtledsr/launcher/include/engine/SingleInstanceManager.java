@@ -11,6 +11,7 @@ public class SingleInstanceManager {
   public static boolean checkIfAlreadyRunning() throws IOException {
     file = new File(Process.getGameDirectory() + "Launcher/client.lock");
     if (!file.exists()) {
+      file.mkdirs();
       file.createNewFile();
     } else {
       return true;
