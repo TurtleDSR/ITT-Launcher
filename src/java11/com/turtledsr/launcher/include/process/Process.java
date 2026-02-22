@@ -8,13 +8,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
@@ -34,6 +32,7 @@ import com.sun.jna.platform.win32.WinReg;
 import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.turtledsr.launcher.Main;
+import com.turtledsr.launcher.include.control.FileHelper;
 import com.turtledsr.launcher.include.engine.LivesplitManager;
 import com.turtledsr.launcher.include.engine.Logs;
 import com.turtledsr.launcher.include.engine.ZipManager;
@@ -79,23 +78,30 @@ public final class Process {
   }
 
   public static void launchItTakesTwoEx() { //launches with all current launcher settings and returns status
-    boolean mods = ToggleModsButton.toggled;
-    if(mods) {
-      disableScriptCache();
-    } else {
-      enableScriptCache();
+    boolean mods = false;
+
+    if(ToggleModsButton.toggled) {
+      for (int i = ModsPanel.mods.size() - 1; i >= 0; i--) { //top mod gets final priority
+        if (ModsPanel.mods.get(i).toggled) {
+          mods = true;
+          break;
+        }
+      }
     }
+
+    final boolean modsEnabled = mods && ToggleModsButton.toggled;
 
     new SwingWorker<Void, Void>() {
       @Override
       protected Void doInBackground() throws Exception {
         //clean scripts
         Logs.log("Cleaning scripts folder", "PROCESS");
-
-        //install default mods
+        FileHelper.deleteSubfolders(getGameDirectory() + "Nuts/Script/");
         installMod(Main.getResourceAsStream("mods/Default.zip"));
 
-        if(mods) {
+        if(modsEnabled) {
+          disableScriptCache();
+
           //install mods
           for (int i = ModsPanel.mods.size() - 1; i >= 0; i--) { //top mod gets final priority
             if (ModsPanel.mods.get(i).toggled) {
@@ -103,6 +109,8 @@ public final class Process {
               installMod(getGameDirectory() + "Mods/" + ModsPanel.mods.get(i).name + ".zip");
             }
           }
+        } else {
+          enableScriptCache();
         }
 
         launchItTakesTwo();
@@ -345,7 +353,7 @@ public final class Process {
 
   public static void installMod(InputStream stream) {
     try {
-      ZipManager.extractFromStream(stream, getGameDirectory() + "Nuts/Script/", getGameDirectory() + "Nuts/Script/Speed/SpeedSettings.as");
+      ZipManager.extractFromStream(stream, getGameDirectory() + "Nuts/Script/");
     } catch (Exception e) {
       Logs.logError("could not install mod: " + e.getMessage(), "PROCESS");
     }
@@ -353,29 +361,13 @@ public final class Process {
 
   public static void installMod(String path) {
     try {
+      if(path.equals(getGameDirectory() + "Mods/Speedtools.zip")) {
+        installMod(Main.getResourceAsStream("mods/Speedtools.zip"));
+        return;
+      }
       installMod(new FileInputStream(new File(path)));
     } catch (Exception e) {
       Logs.logError("could not install mod: " + e.getMessage(), "PROCESS");
-    }
-  }
-
-  public static void moveFolders(Path sourceDir, Path destinationDir) throws IOException {
-    try{
-      if (!Files.exists(destinationDir)) {
-      Files.createDirectories(destinationDir);
-      }
-    } catch(Exception e) {Logs.logError(e.getMessage(), "PROCESS");} //should never fail
-
-    try (Stream<Path> stream = Files.list(sourceDir)) {
-      stream.filter(Files::isDirectory)
-        .forEach(folderPath -> {
-          Path destination = destinationDir.resolve(folderPath.getFileName());
-          try {
-            Files.move(folderPath, destination, StandardCopyOption.REPLACE_EXISTING);
-          } catch (IOException e) {
-            Logs.logError("Failed to move folder " + folderPath.getFileName() + ": " + e.getMessage(), "PROCESS");
-          }
-      });
     }
   }
 }

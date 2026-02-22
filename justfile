@@ -1,22 +1,8 @@
 #build both java launcher and c wrapper executable in the specified dir (default: .build)
 [group: 'build']
 [windows]
-build folder=".build": build-J build-C
-  @#create missing directories
-  @[ -d build/{{folder}} ] || mkdir -p build/{{folder}}
-
-  @#copy jars
-  @echo copy jar
-  cp build/libs/*.jar build/{{folder}}/
-
-  @#copy jre
-  @echo copy jre
-  cp -r build/jre/ build/{{folder}}/
-
-  @#copy exe's
-  @echo copy exe
-  cp build/c/*.exe build/{{folder}}/
-
+build folder=".build": build-J build-C 
+  @just copy {{folder}}
   @just zip {{folder}}
 
 #build both java launcher and c wrapper in the .debug dir
@@ -56,7 +42,26 @@ update-ico:
   magick src/java11/resources/img/icon.png src/launch/icon.ico
 
 #zip files
-[group: 'zip']
+[group: 'package']
 [windows]
 zip folder=".build":
   ./zip.exe build/{{folder}}/ build/{{folder}}/ITT-launcher.zip
+
+#copy files
+[group: 'package']
+[windows]
+copy folder=".build":
+  @#create missing directories
+  @[ -d build/{{folder}} ] || mkdir -p build/{{folder}}
+
+  @#copy jars
+  @echo copy jar
+  cp build/libs/*.jar build/{{folder}}/
+
+  @#copy jre
+  @echo copy jre
+  cp -r build/jre/ build/{{folder}}/
+
+  @#copy exe's
+  @echo copy exe
+  cp build/c/*.exe build/{{folder}}/
