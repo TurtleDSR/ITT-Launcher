@@ -17,11 +17,13 @@ build folder=".build": build-J build-C
   @echo copy exe
   cp build/c/*.exe build/{{folder}}/
 
+  @just zip {{folder}}
+
 #build both java launcher and c wrapper in the .debug dir
 [group: 'build']
 [windows]
 debug: 
-  just build .debug
+  @just build .debug
 
 #build java launcher
 [group: 'java']
@@ -52,3 +54,9 @@ build-C:
 [windows]
 update-ico:
   magick src/java11/resources/img/icon.png src/launch/icon.ico
+
+#zip files
+[group: 'zip']
+[windows]
+zip folder=".build":
+  ./zip.exe build/{{folder}}/ build/{{folder}}/ITT-launcher.zip
