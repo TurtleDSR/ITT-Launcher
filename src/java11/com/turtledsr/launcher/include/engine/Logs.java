@@ -20,24 +20,30 @@ public final class Logs {
     MainFrame.logPanel.log("[LOG] " + message.toString() + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
     scheduleLog(message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
   }
-
+  
   public static void logError(Object message) {
     MainFrame.logPanel.log("[ERROR] " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
     scheduleError(message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
   }
-
+  
   public static void log(Object message, String instigator) {
     if(!(instigator.equals("AUTOSPLITTER") || instigator.equals("TIMERHANDLER"))) {
       MainFrame.logPanel.log("[" + instigator + "]: " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
     }
     scheduleLog("[" + instigator + "]: " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
   }
-
+  
   public static void logError(Object message, String instigator) {
     if(!(instigator.equals("AUTOSPLITTER") || instigator.equals("TIMERHANDLER"))) {
       MainFrame.logPanel.log("[ERROR] [" + instigator + "]: " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
     }
     scheduleError("[" + instigator + "]: " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+  }
+  
+  public static void printStacktrace(StackTraceElement[] trace) {
+    for (StackTraceElement stackTraceElement : trace) {
+      System.err.println(stackTraceElement.toString());
+    }
   }
 
   private static void scheduleLog(String message) {
@@ -47,6 +53,7 @@ public final class Logs {
   private static void scheduleError(String message) {
     try{new LogWorker(message, true).execute();} catch(Exception e) {}
   }
+
 }
 
 final class LogWorker extends SwingWorker<Void, Void> {

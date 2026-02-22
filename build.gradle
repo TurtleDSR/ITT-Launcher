@@ -49,6 +49,8 @@ tasks.named('processJava11Resources') {
 }
 
 jar {
+  archiveFileName = 'ITT-launcher.jar'
+
   manifest {
     attributes('Multi-Release': 'true', 'Main-Class': 'com.turtledsr.launcher.Main')
   }

@@ -8,10 +8,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,16 +79,23 @@ public final class Process {
   }
 
   public static void launchItTakesTwoEx() { //launches with all current launcher settings and returns status
+    boolean mods = ToggleModsButton.toggled;
+    if(mods) {
+      disableScriptCache();
+    } else {
+      enableScriptCache();
+    }
+
     new SwingWorker<Void, Void>() {
       @Override
       protected Void doInBackground() throws Exception {
-        disableScriptCache();
+        //clean scripts
+        Logs.log("Cleaning scripts folder", "PROCESS");
 
-        if (ToggleModsButton.toggled) { //mods enabled
-          //clean scripts
-          Logs.log("Cleaning scripts folder", "PROCESS");
-          installMod(Main.getResourceAsStream("mods/Default.zip"));
+        //install default mods
+        installMod(Main.getResourceAsStream("mods/Default.zip"));
 
+        if(mods) {
           //install mods
           for (int i = ModsPanel.mods.size() - 1; i >= 0; i--) { //top mod gets final priority
             if (ModsPanel.mods.get(i).toggled) {
@@ -94,13 +103,8 @@ public final class Process {
               installMod(getGameDirectory() + "Mods/" + ModsPanel.mods.get(i).name + ".zip");
             }
           }
-
-        } else {
-          //remove mods
-          Logs.log("Uninstalling mods", "PROCESS");
-          installMod(Main.getResourceAsStream("mods/Default.zip"));
         }
-        
+
         launchItTakesTwo();
         return null;
       }
@@ -305,32 +309,35 @@ public final class Process {
   }
 
   public static void enableScriptCache() {
+    Logs.log("Enabling script cache", "PROCESS");
     if (getScriptCacheEnabled())
       return;
 
-    File target = new File(getGameDirectory() + "Nuts/Script/PrecompiledScript/");
-    if (!target.exists())
-      target.mkdir();
-
-    Path source = new File(getGameDirectory() + "Nuts/Script/PrecompiledScript.Cache").toPath();
+    Path target = Paths.get(getGameDirectory() + "Nuts/Script/PrecompiledScript.Cache");
+    Path source = Paths.get(getGameDirectory() + "Nuts/Script/PrecompiledScript/PrecompiledScript.Cache");
 
     try {
-      Files.move(source, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+      Files.move(source, target);
+
+      File tempDir = new File(getGameDirectory() + "Nuts/Script/PrecompiledScript/");
+      tempDir.delete();
     } catch (Exception e) {
       Logs.logError(e.getMessage(), "PROCESS");
     }
   }
 
   public static void disableScriptCache() {
+    Logs.log("Disabling script cache", "PROCESS");
     if (!getScriptCacheEnabled())
       return;
 
-    File target = new File(getGameDirectory() + "Nuts/Script/");
-
-    Path source = new File(getGameDirectory() + "Nuts/Script/PrecompiledScript/PrecompiledScript.Cache").toPath();
+    Path target = Paths.get(getGameDirectory() + "Nuts/Script/PrecompiledScript/PrecompiledScript.Cache");
+    Path source = Paths.get(getGameDirectory() + "Nuts/Script/PrecompiledScript.Cache");
 
     try {
-      Files.move(source, target.toPath(), StandardCopyOption.REPLACE_EXISTING);
+      Files.createDirectories(target.getParent()); //create temp folder
+
+      Files.move(source, target);
     } catch (Exception e) {
       Logs.logError(e.getMessage(), "PROCESS");
     }
@@ -349,6 +356,26 @@ public final class Process {
       installMod(new FileInputStream(new File(path)));
     } catch (Exception e) {
       Logs.logError("could not install mod: " + e.getMessage(), "PROCESS");
+    }
+  }
+
+  public static void moveFolders(Path sourceDir, Path destinationDir) throws IOException {
+    try{
+      if (!Files.exists(destinationDir)) {
+      Files.createDirectories(destinationDir);
+      }
+    } catch(Exception e) {Logs.logError(e.getMessage(), "PROCESS");} //should never fail
+
+    try (Stream<Path> stream = Files.list(sourceDir)) {
+      stream.filter(Files::isDirectory)
+        .forEach(folderPath -> {
+          Path destination = destinationDir.resolve(folderPath.getFileName());
+          try {
+            Files.move(folderPath, destination, StandardCopyOption.REPLACE_EXISTING);
+          } catch (IOException e) {
+            Logs.logError("Failed to move folder " + folderPath.getFileName() + ": " + e.getMessage(), "PROCESS");
+          }
+      });
     }
   }
 }
