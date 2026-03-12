@@ -126,10 +126,20 @@ public final class Process {
   public static boolean launchItTakesTwo() { //returns status
     if(steamDirectory == null) getSteamDirectory();
     String appId = "1426210";
-    String launchArgs = "-devmenu -dx12";
+    String[] launchArgs = {"-devmenu", "-dx12"};
+
+    ArrayList<String> command = new ArrayList<>();
+
+    command.add(steamDirectory + "/steam.exe");
+    command.add("-applaunch");
+    command.add(appId);
+
+    for (String arg : launchArgs) { //add arguments
+      command.add(arg);
+    }
 
     try {
-      new ProcessBuilder(steamDirectory + "/steam.exe", "-applaunch", appId, launchArgs).start();
+      new ProcessBuilder(command).start();
 
       Logs.log("Successfully launched game", "PROCESS");
       return true;
