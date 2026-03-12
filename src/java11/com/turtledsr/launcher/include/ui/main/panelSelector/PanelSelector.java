@@ -26,6 +26,7 @@ import com.turtledsr.launcher.include.ui.styled.RoundedFlatButton;
 
 public final class PanelSelector extends JPanel {
   private static PanelSelectorButton launcherButton;
+  private static PanelSelectorButton toolsButton;
   private static PanelSelectorButton logButton;
   private static RoundedFlatButton launchGameButton;
 
@@ -47,6 +48,11 @@ public final class PanelSelector extends JPanel {
 
     if(launcherButton == null) launcherButton = new PanelSelectorButton("Mods", MainFrame.LAUNCHER);
     add(launcherButton, c);
+
+    c.gridx += 1;
+
+    if(toolsButton == null) toolsButton = new PanelSelectorButton("Tools", MainFrame.TOOLS);
+    add(toolsButton, c);
 
     c.gridx += 1;
 
@@ -103,6 +109,7 @@ public final class PanelSelector extends JPanel {
 
   public void updateButtons() {
     launcherButton.update();
+    toolsButton.update();
     logButton.update();
   }
 }

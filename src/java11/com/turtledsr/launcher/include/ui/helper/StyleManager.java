@@ -43,4 +43,7 @@ public final class StyleManager {
   public static Color toggle_on_color = ColorUtils.hextoColor("#253ce7");
   public static Color toggle_off_color = ColorUtils.hextoColor("#0d154e");
   public static Color mods_toggle_off_color = ColorUtils.hextoColor("#3a1d1d");
+
+  public static Color tool_button_color = ColorUtils.hextoColor("#825a8a");
+  public static Color tool_button_hover_color = ColorUtils.hextoColor("#9c77a3");
 }

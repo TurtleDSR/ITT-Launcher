@@ -21,11 +21,16 @@ public final class ZipManager {
       int readLen;
 
       while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
-        File extractedFile = new File(destination + localFileHeader.getFileName());
+        File extractedFile = new File(destination + "/" + localFileHeader.getFileName());
 
         if (localFileHeader.isDirectory()) {
           extractedFile.mkdirs();
           continue;
+        }
+
+        File parent = extractedFile.getParentFile();
+        if (parent != null && !parent.exists()) {
+          parent.mkdirs();
         }
 
         try (OutputStream outputStream = new FileOutputStream(extractedFile)) {
@@ -44,7 +49,7 @@ public final class ZipManager {
       int readLen;
 
       while ((localFileHeader = zipInputStream.getNextEntry()) != null) {
-        File extractedFile = new File(destination + localFileHeader.getFileName());
+        File extractedFile = new File(destination + "/" + localFileHeader.getFileName());
 
         String normalizedFileName = extractedFile.getAbsolutePath().replace("\\", "/");
         String normalizedIgnorePath = ignorePath.replace("\\", "/");

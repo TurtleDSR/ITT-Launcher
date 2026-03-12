@@ -15,6 +15,7 @@ import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.main.launcher.LauncherPanel;
 import com.turtledsr.launcher.include.ui.main.panelSelector.PanelSelector;
 import com.turtledsr.launcher.include.ui.main.titleBar.TitleBar;
+import com.turtledsr.launcher.include.ui.main.tools.ToolsPanel;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -29,12 +30,14 @@ public final class MainFrame extends JFrame {
   public static final double CORNER_ROUNDING = 12;
 
   public static final int LAUNCHER = 0;
-  public static final int LOGS = 1;
+  public static final int TOOLS = 1;
+  public static final int LOGS = 2;
 
   public static TitleBar titleBar;
   public static PanelSelector panelSelector;
 
   public static LauncherPanel launcherPanel;
+  public static ToolsPanel toolsPanel;
   public static LogPanel logPanel;
 
   public static int selectedPanel;
@@ -63,6 +66,7 @@ public final class MainFrame extends JFrame {
     if(panelSelector == null) panelSelector = new PanelSelector();
 
     if(launcherPanel == null) launcherPanel = new LauncherPanel();
+    if(toolsPanel == null) toolsPanel = new ToolsPanel();
     if(logPanel == null) logPanel = new LogPanel();
 
     getContentPane().setBackground(StyleManager.background_color);
@@ -79,6 +83,7 @@ public final class MainFrame extends JFrame {
     setTitle(Main.TITLE);
 
     add(launcherPanel, c);
+    add(toolsPanel, c);
     add(logPanel, c);
 
     setSelectedPanel(selectedPanel);
@@ -105,6 +110,7 @@ public final class MainFrame extends JFrame {
 
   private static void setPanelsInvis() {
     launcherPanel.setVisible(false);
+    toolsPanel.setVisible(false);
     logPanel.setVisible(false);
   }
 
@@ -113,6 +119,11 @@ public final class MainFrame extends JFrame {
     if(panel == LAUNCHER) {
       launcherPanel.setVisible(true);
       launcherPanel.requestFocusInWindow();
+    }
+
+    if(panel == TOOLS) {
+      toolsPanel.setVisible(true);
+      toolsPanel.requestFocusInWindow();
     }
 
     if(panel == LOGS) {

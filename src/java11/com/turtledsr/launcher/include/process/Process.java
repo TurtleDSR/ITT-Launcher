@@ -43,6 +43,7 @@ import com.turtledsr.launcher.include.ui.main.launcher.ToggleModsButton;
 public final class Process {
   private static String gameDirectory;
   private static String steamDirectory;
+  private static String shaderCacheHash;
 
   public static OptionalInt getProcessPID(String processName) {
     return getProcessPID(processName, true);
@@ -90,7 +91,10 @@ public final class Process {
     }
 
     final boolean modsEnabled = mods && ToggleModsButton.toggled;
+    launchItTakesTwoEx(modsEnabled);
+  }
 
+  public static void launchItTakesTwoEx(final boolean modsEnabled) { //launches with all current launcher settings and returns status
     new SwingWorker<Void, Void>() {
       @Override
       protected Void doInBackground() throws Exception {
@@ -200,6 +204,40 @@ public final class Process {
     }
 
     return gameDirectory;
+  }
+
+  public static String getShaderCacheHash() { 
+    if(shaderCacheHash != null) return shaderCacheHash;
+
+    File shaderCacheFolder = new File(System.getenv("localappdata") + "/ItTakesTwo/Saved/");
+
+    File[] files = shaderCacheFolder.listFiles();
+
+    if (files == null || files.length == 0) {
+      Logs.logError("NO CACHE HASH FOUND", "PROCESS");
+      return null;
+    }
+
+    for (File f : files) {
+      if (f == null)
+        continue;
+      String fullname = f.getName();
+      int partition = fullname.lastIndexOf('.');
+      if (partition == -1)
+        continue;
+      String extension = fullname.substring(partition + 1);
+      String name = fullname.substring(0, partition);
+      if (extension.equalsIgnoreCase("ushaderprecache")) {
+        if(name.startsWith("D3DCompute_")) {
+          shaderCacheHash = name.substring(name.indexOf('_') + 1);
+          Logs.log("Shader Cache Hash Found: " + shaderCacheHash, "PROCESS");
+          return shaderCacheHash;
+        }
+      }
+    }
+
+    Logs.logError("NO CACHE HASH FOUND", "PROCESS");
+    return null;
   }
 
   public static ArrayList<Mod> getModList() {

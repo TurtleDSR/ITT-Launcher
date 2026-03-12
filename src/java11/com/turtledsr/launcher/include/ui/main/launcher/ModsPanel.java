@@ -77,6 +77,13 @@ public final class ModsPanel extends JPanel implements MouseWheelListener {
     }
   }
 
+  public static void refreshMods() {
+    startingModIndex = 0;
+    mods = Process.getModList();
+
+    updateModList();
+  }
+
   @Override
   public void mouseWheelMoved(MouseWheelEvent e) {
     if(mods.size() > 10) {

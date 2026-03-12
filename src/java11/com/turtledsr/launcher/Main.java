@@ -8,6 +8,7 @@ import java.io.InputStream;
 
 import com.turtledsr.launcher.include.control.Autosplitter;
 import com.turtledsr.launcher.include.control.TimerHandler;
+import com.turtledsr.launcher.include.engine.ShaderManager;
 import com.turtledsr.launcher.include.engine.SingleInstanceManager;
 import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.process.Process;
@@ -36,6 +37,7 @@ public final class Main {
 
     ImageManager.loadImages();
     FontManager.loadFonts();
+    ShaderManager.extractShaders();
     //LivesplitManager.extractTimer();
 
     mainFrame = new MainFrame();
