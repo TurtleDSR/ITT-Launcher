@@ -47,7 +47,7 @@ public final class ModsPanel extends JPanel implements MouseWheelListener {
       if(mods != null && i < mods.size()) {
         modButtons[i] = new ModButton(mods.get(i));
       } else {
-        break;
+        modButtons[i] = new ModButton(null);
       }
 
       add(modButtons[i], c);
@@ -72,7 +72,8 @@ public final class ModsPanel extends JPanel implements MouseWheelListener {
         }
         modButtons[i].update();
       } else {
-        break;
+        modButtons[i].mod = null;
+        modButtons[i].update();
       }
     }
   }

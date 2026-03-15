@@ -48,12 +48,16 @@ public final class ModButton extends RoundedPanel implements ActionListener {
     c.weighty = 1;
     c.gridx = 0;
     c.gridy = 0;
-
-    modLabel = new JLabel(mod.name);
+    
+    modLabel = new JLabel();
     modLabel.setFont(FontManager.poppins.deriveFont(Font.BOLD, 16f));
     modLabel.setForeground(StyleManager.foreground_color);
 
-    toggle = new ModToggleButton(mod.toggled);
+    if(mod != null) {
+      modLabel.setText(mod.name);
+    }
+
+    toggle = new ModToggleButton(false);
     toggle.addActionListener(this);
     toggle.addMouseListener(new MouseAdapter() {
       @Override
@@ -66,6 +70,10 @@ public final class ModButton extends RoundedPanel implements ActionListener {
         setBackground(StyleManager.background_color);
       }
     });
+
+    if(mod != null) {
+      toggle.toggled = mod.toggled;
+    }
 
     add(modLabel, c);
 
@@ -94,12 +102,19 @@ public final class ModButton extends RoundedPanel implements ActionListener {
     addMouseMotionListener(adapter);
 
     this.mod = mod;
+
+    if(mod == null) setVisible(false);
   }
 
   public void update() {
+    if(mod == null) {
+      setVisible(false);
+      return;
+    }
+
+    setVisible(true);
     modLabel.setText(mod.name);
     toggle.toggled = mod.toggled;
-    toggle.update();
   }
 
   @Override
@@ -119,6 +134,8 @@ class DragAdapter extends MouseAdapter {
 
   @Override
   public void mousePressed(MouseEvent e) {
+    if(parent.mod == null) return;
+
     for (int i = 0; i < ModsPanel.MODCOUNT; i++) {
       if (ModsPanel.modButtons[i] == parent) {
         activeSlotIndex = i;
@@ -129,6 +146,7 @@ class DragAdapter extends MouseAdapter {
 
   @Override
   public void mouseDragged(MouseEvent e) {
+    if(parent.mod == null) return;
     if (activeSlotIndex == -1) return;
 
     Point p = SwingUtilities.convertPoint(parent, e.getPoint(), parent.getParent());
