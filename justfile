@@ -54,6 +54,9 @@ copy folder=".build":
   @#create missing directories
   @[ -d build/{{folder}} ] || mkdir -p build/{{folder}}
 
+  @#delete dx12 folder
+  @rm -rf build/{{folder}}/dx12/
+
   @#copy jars
   @echo copy jar
   cp build/libs/*.jar build/{{folder}}/
