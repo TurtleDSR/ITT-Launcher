@@ -73,6 +73,7 @@ public final class ModButton extends RoundedPanel implements ActionListener {
 
     if(mod != null) {
       toggle.toggled = mod.toggled;
+      toggle.update();
     }
 
     add(modLabel, c);
@@ -115,6 +116,7 @@ public final class ModButton extends RoundedPanel implements ActionListener {
     setVisible(true);
     modLabel.setText(mod.name);
     toggle.toggled = mod.toggled;
+    toggle.update();
   }
 
   @Override
