@@ -18,7 +18,7 @@ int main() {
 
   strcpy_s(dir, MAX_PATH, exePath);
   sprintf_s(commandLine, sizeof(commandLine), 
-    "\"%s\\jre\\bin\\javaw.exe\" -jar \"%s\\ITT-launcher.jar\"", 
+    "\"%s/jre/bin/javaw.exe\" -jar \"%s/ITT-launcher.jar\"",
     dir, dir);
 
   printf("Attempting to run: %s\n\n", commandLine);
