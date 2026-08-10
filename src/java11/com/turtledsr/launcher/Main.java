@@ -19,7 +19,6 @@ import com.turtledsr.launcher.include.ui.main.MainFrame;
 
 public final class Main {
   public static final String TITLE = "It Takes Two Launcher";
-  public static final float VERSION = 1.0f;
   public static final boolean SHOW_CUSTOM_TITLEBAR = true;
 
   public static final int RECONNECTION_INTERVAL = 500;
