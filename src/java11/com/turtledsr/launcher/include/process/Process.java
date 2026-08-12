@@ -121,6 +121,24 @@ public final class Process {
               installMod(getGameDirectory() + "Mods/" + ModsPanel.mods.get(i).name + ".zip");
             }
           }
+
+          //patch speedtools to be on by default
+          Path speedSettingsPath = Paths.get(getGameDirectory(), "Nuts/Script/Speed/SpeedSettings.as");
+
+          if (Files.exists(speedSettingsPath)) {
+            Logs.log("Speedtools exists");
+            List<String> lines = Files.readAllLines(speedSettingsPath);
+
+            if (!lines.isEmpty()) {
+              lines.set(0, "const bool SpeedToolsActiveOnLaunch = true;");
+              Files.write(speedSettingsPath, lines);
+              Logs.log("Speedtools updated successfully");
+            } else {
+              Logs.log("Speedtools file was empty, nothing patched");
+            }
+          } else {
+            Logs.log("Speedtools file not found at: " + speedSettingsPath.toAbsolutePath());
+          }
         } else {
           enableScriptCache();
         }
@@ -145,7 +163,7 @@ public final class Process {
     for (String arg : launchArgs) { //add arguments
       command.add(arg);
     }
-
+    
     try {
       new ProcessBuilder(command).start();
 
@@ -153,7 +171,7 @@ public final class Process {
       EventManager.triggerEvent("game_launched");
       return true;
     } catch (Exception e) {
-      Logs.logError("Failed to launch game" + e.getMessage(), "PROCESS");
+      Logs.logError("Failed to launch game: " + e.getMessage(), "PROCESS");
       return false;
     }
   }
@@ -418,10 +436,6 @@ public final class Process {
 
   public static void installMod(String path) {
     try {
-      if(path.equals(getGameDirectory() + "Mods/Speedtools.zip")) {
-        installMod(Main.getResourceAsStream("mods/Speedtools.zip"));
-        return;
-      }
       installMod(new FileInputStream(new File(path)));
     } catch (Exception e) {
       Logs.logError("could not install mod: " + e.getMessage(), "PROCESS");

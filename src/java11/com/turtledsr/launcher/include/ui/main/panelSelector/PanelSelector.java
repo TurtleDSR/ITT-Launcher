@@ -52,9 +52,9 @@ public final class PanelSelector extends JPanel {
     add(launcherButton, c);
     c.gridx += 1;
 
-    if(rankedButton == null) rankedButton = new PanelSelectorButton("Ranked", MainPanel.RANKED);
-    add(rankedButton, c);
-    c.gridx += 1;
+    //if(rankedButton == null) rankedButton = new PanelSelectorButton("Ranked", MainPanel.RANKED);
+    //add(rankedButton, c);
+    //c.gridx += 1;
 
     if(toolsButton == null) toolsButton = new PanelSelectorButton("Tools", MainPanel.TOOLS);
     add(toolsButton, c);
@@ -117,14 +117,14 @@ public final class PanelSelector extends JPanel {
 
     //developer tabs
     if(!SettingsManager.settings.developerSettings.devMode) {
-      logButton.setVisible(false);
-      rankedButton.setVisible(false);
+      if(logButton != null) logButton.setVisible(false);
+      if(rankedButton != null) rankedButton.setVisible(false);
     }
     EventManager.addListener(new EventListener() {
       @Override
       public void eventTriggered() {
-        logButton.setVisible(SettingsManager.settings.developerSettings.devMode);
-        rankedButton.setVisible(SettingsManager.settings.developerSettings.devMode);
+        if(logButton != null) logButton.setVisible(SettingsManager.settings.developerSettings.devMode);
+        if(rankedButton != null) rankedButton.setVisible(SettingsManager.settings.developerSettings.devMode);
       }
     }, "DevMode_Toggled");
     
