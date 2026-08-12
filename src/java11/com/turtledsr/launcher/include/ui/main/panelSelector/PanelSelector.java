@@ -17,15 +17,17 @@ import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 import com.turtledsr.launcher.Main;
+import com.turtledsr.launcher.include.config.SettingsManager;
 import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.process.Process;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.main.MainFrame;
+import com.turtledsr.launcher.include.ui.main.rootPanels.MainPanel;
 import com.turtledsr.launcher.include.ui.styled.RoundedFlatButton;
 
 public final class PanelSelector extends JPanel {
   private static PanelSelectorButton launcherButton;
+  private static PanelSelectorButton rankedButton;
   private static PanelSelectorButton toolsButton;
   private static PanelSelectorButton logButton;
   private static RoundedFlatButton launchGameButton;
@@ -46,20 +48,22 @@ public final class PanelSelector extends JPanel {
     c.weightx = 0;
     c.weighty = 0;
 
-    if(launcherButton == null) launcherButton = new PanelSelectorButton("Mods", MainFrame.LAUNCHER);
+    if(launcherButton == null) launcherButton = new PanelSelectorButton("Mods", MainPanel.LAUNCHER);
     add(launcherButton, c);
-
     c.gridx += 1;
 
-    if(toolsButton == null) toolsButton = new PanelSelectorButton("Tools", MainFrame.TOOLS);
+    if(rankedButton == null) rankedButton = new PanelSelectorButton("Ranked", MainPanel.RANKED);
+    add(rankedButton, c);
+    c.gridx += 1;
+
+    if(toolsButton == null) toolsButton = new PanelSelectorButton("Tools", MainPanel.TOOLS);
     add(toolsButton, c);
-
     c.gridx += 1;
 
-    if(logButton == null) logButton = new PanelSelectorButton("Logs", MainFrame.LOGS);
+    if(logButton == null) logButton = new PanelSelectorButton("Logs", MainPanel.LOGS);
     add(logButton, c);
-
     c.gridx += 1;
+
     c.weightx = 1;
     c.weighty = 1;
     c.anchor = GridBagConstraints.EAST;
@@ -83,12 +87,19 @@ public final class PanelSelector extends JPanel {
     launchGameButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if(!launchGameButton.getText().equals("Launch")) return; //only launch when game is not already running
-
-        launchGameButton.setText("Launching...");
-        Process.launchItTakesTwoEx();
+        if(launchGameButton.getText().equals("Launch")) { //launch
+          PanelSelector.launchGameButton.setText("Starting...");
+          Process.launchItTakesTwoEx();
+        }
       }
     });
+
+    EventManager.addListener(new EventListener() {
+      @Override
+      public void eventTriggered() {
+        PanelSelector.launchGameButton.setText("Started");
+      }
+    }, "game_launched");
 
     EventManager.addListener(new EventListener() {
       @Override
@@ -103,13 +114,27 @@ public final class PanelSelector extends JPanel {
         PanelSelector.launchGameButton.setText("Launch");
       }
     }, "game_disconnected");
+
+    //developer tabs
+    if(!SettingsManager.settings.developerSettings.devMode) {
+      logButton.setVisible(false);
+      rankedButton.setVisible(false);
+    }
+    EventManager.addListener(new EventListener() {
+      @Override
+      public void eventTriggered() {
+        logButton.setVisible(SettingsManager.settings.developerSettings.devMode);
+        rankedButton.setVisible(SettingsManager.settings.developerSettings.devMode);
+      }
+    }, "DevMode_Toggled");
     
     add(launchGameButton, c);
   }
 
   public void updateButtons() {
-    launcherButton.update();
-    toolsButton.update();
-    logButton.update();
+    if(launcherButton != null) launcherButton.update();
+    if(rankedButton != null) rankedButton.update();
+    if(toolsButton != null) toolsButton.update();
+    if(logButton != null) logButton.update();
   }
 }

@@ -45,7 +45,7 @@ public final class MinimiseButton extends FlatButton {
     addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        Main.mainFrame.setState(Frame.ICONIFIED);
+        Main.window.setState(Frame.ICONIFIED);
       }
     });
   }

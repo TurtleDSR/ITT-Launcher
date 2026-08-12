@@ -36,6 +36,7 @@ import com.turtledsr.launcher.include.control.FileHelper;
 import com.turtledsr.launcher.include.engine.LivesplitManager;
 import com.turtledsr.launcher.include.engine.Logs;
 import com.turtledsr.launcher.include.engine.ZipManager;
+import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.struct.Mod;
 import com.turtledsr.launcher.include.ui.main.launcher.ModsPanel;
 import com.turtledsr.launcher.include.ui.main.launcher.ToggleModsButton;
@@ -44,6 +45,13 @@ public final class Process {
   private static String gameDirectory;
   private static String steamDirectory;
   private static String shaderCacheHash;
+  
+  public static int STOPPED = 0; //game is fully closed
+  public static int STARTING = 1; //launch process has begin locally
+  public static int STARTED = 2; //steam launch process has begun
+  public static int RUNNING = 3; //game is fully started up *may still be loading*
+
+  public static int gameStatus = STOPPED;
 
   public static OptionalInt getProcessPID(String processName) {
     return getProcessPID(processName, true);
@@ -94,7 +102,7 @@ public final class Process {
     launchItTakesTwoEx(modsEnabled);
   }
 
-  public static void launchItTakesTwoEx(final boolean modsEnabled) { //launches with all current launcher settings and returns status
+  public static void launchItTakesTwoEx(final boolean modsEnabled) { //launches with all current launcher settings
     new SwingWorker<Void, Void>() {
       @Override
       protected Void doInBackground() throws Exception {
@@ -142,6 +150,7 @@ public final class Process {
       new ProcessBuilder(command).start();
 
       Logs.log("Successfully launched game", "PROCESS");
+      EventManager.triggerEvent("game_launched");
       return true;
     } catch (Exception e) {
       Logs.logError("Failed to launch game" + e.getMessage(), "PROCESS");

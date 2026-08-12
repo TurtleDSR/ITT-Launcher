@@ -1,3 +1,7 @@
+/*
+Makes sure only one instance of the launcher can run at once
+*/
+
 package com.turtledsr.launcher.include.engine;
 
 import java.io.File;

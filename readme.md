@@ -5,6 +5,7 @@ Currently only supports the Steam build of the game, I will possibly add EA supp
 
 If you have any issues running message me on discord @TurtleDSR
 
-Credit to the authors of the external libraries used:
+Credit to the authors and contributors of the external libraries used:
+  Jackson Project
   JNA
   zip4j

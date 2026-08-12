@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import com.turtledsr.launcher.Main;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.main.MainFrame;
+import com.turtledsr.launcher.include.ui.main.Window;
 
 public final class TitleBar extends JPanel {
   private static JLabel titleLabel;
@@ -54,8 +54,8 @@ public final class TitleBar extends JPanel {
     c.gridx += 1;
     c.weightx = 0;
 
-    //add(new SettingsButton(), c);
-    //c.gridx += 1;
+    add(new SettingsButton(), c);
+    c.gridx += 1;
 
     add(new MinimiseButton(), c);
     c.gridx += 1;
@@ -75,7 +75,7 @@ public final class TitleBar extends JPanel {
     addMouseMotionListener(new MouseAdapter() {
       @Override
       public void mouseDragged(MouseEvent e) {
-        if(MainFrame.draggable && (e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) Main.mainFrame.setLocation(e.getXOnScreen() - xOffset, e.getYOnScreen() - yOffset);
+        if(Window.draggable && (e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) Main.window.setLocation(e.getXOnScreen() - xOffset, e.getYOnScreen() - yOffset);
       }
     });
   }

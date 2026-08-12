@@ -6,40 +6,65 @@ package com.turtledsr.launcher;
 
 import java.io.InputStream;
 
+import com.turtledsr.launcher.include.config.SettingsManager;
 import com.turtledsr.launcher.include.control.Autosplitter;
 import com.turtledsr.launcher.include.control.TimerHandler;
 import com.turtledsr.launcher.include.engine.ShaderManager;
 import com.turtledsr.launcher.include.engine.SingleInstanceManager;
+import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.process.Process;
 import com.turtledsr.launcher.include.ui.debug.LogPanel;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.ImageManager;
-import com.turtledsr.launcher.include.ui.main.MainFrame;
+import com.turtledsr.launcher.include.ui.main.Window;
+import com.turtledsr.launcher.include.ui.main.rootPanels.MainPanel;
 
 public final class Main {
   public static final String TITLE = "It Takes Two Launcher";
-  public static final boolean SHOW_CUSTOM_TITLEBAR = true;
 
   public static final int RECONNECTION_INTERVAL = 500;
   public static boolean scriptCacheEnabled = Process.getScriptCacheEnabled();
-  public static MainFrame mainFrame;
   public static boolean lockQueue = false;
-
+  
   public static boolean timerConnected = false;
   public static boolean gameConnected = false;
-
+  
+  public static Window window;
+  
   public static void main(String[] args) throws Exception {
     if(SingleInstanceManager.checkIfAlreadyRunning()) System.exit(-1); //check if program is already running
+    MainPanel.createLogPanel(); //initialize log panel first so we can log things
 
-    MainFrame.createLogPanel(); //initialize log panel first so we can log things
+    SettingsManager.loadSettings();
 
     ImageManager.loadImages();
     FontManager.loadFonts();
     ShaderManager.extractShaders();
     //LivesplitManager.extractTimer();
 
-    mainFrame = new MainFrame();
+    EventManager.addListener(new EventListener() {
+      @Override
+      public void eventTriggered() {
+        Process.gameStatus = Process.STARTING;
+      }
+    }, "game_launched");
+
+    EventManager.addListener(new EventListener() {
+      @Override
+      public void eventTriggered() {
+        Process.gameStatus = Process.RUNNING;
+      }
+    }, "game_connected");
+
+    EventManager.addListener(new EventListener() {
+      @Override
+      public void eventTriggered() {
+        Process.gameStatus = Process.STOPPED;
+      }
+    }, "game_disconnected");
+
+    window = new Window();
 
     TimerHandler.connect();
     Autosplitter.bind();

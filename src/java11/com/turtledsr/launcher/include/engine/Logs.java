@@ -13,29 +13,29 @@ import java.time.format.DateTimeFormatter;
 
 import javax.swing.SwingWorker;
 
-import com.turtledsr.launcher.include.ui.main.MainFrame;
+import com.turtledsr.launcher.include.ui.main.rootPanels.MainPanel;
 
 public final class Logs {
   public static void log(Object message) {
-    MainFrame.logPanel.log("[LOG] " + message.toString() + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+    MainPanel.logPanel.log("[LOG] " + message.toString() + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
     scheduleLog(message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
   }
   
   public static void logError(Object message) {
-    MainFrame.logPanel.log("[ERROR] " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+    MainPanel.logPanel.log("[ERROR] " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
     scheduleError(message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
   }
   
   public static void log(Object message, String instigator) {
     if(!(instigator.equals("AUTOSPLITTER") || instigator.equals("TIMERHANDLER"))) {
-      MainFrame.logPanel.log("[" + instigator + "]: " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+      MainPanel.logPanel.log("[" + instigator + "]: " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
     }
     scheduleLog("[" + instigator + "]: " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
   }
   
   public static void logError(Object message, String instigator) {
     if(!(instigator.equals("AUTOSPLITTER") || instigator.equals("TIMERHANDLER"))) {
-      MainFrame.logPanel.log("[ERROR] [" + instigator + "]: " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+      MainPanel.logPanel.log("[ERROR] [" + instigator + "]: " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
     }
     scheduleError("[" + instigator + "]: " + message + " - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
   }

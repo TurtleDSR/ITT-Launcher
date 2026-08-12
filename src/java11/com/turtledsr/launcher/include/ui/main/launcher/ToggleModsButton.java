@@ -8,15 +8,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import com.turtledsr.launcher.include.config.SettingsManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.styled.RoundedFlatButton;
 
 public final class ToggleModsButton extends RoundedFlatButton implements ActionListener, MouseListener {
-  public static boolean toggled = true;
+  public static boolean toggled = SettingsManager.settings.persistenceSettings.modsEnabled;
   private static boolean hovered = false;
 
   public ToggleModsButton() {
     super("Disable Mods", StyleManager.toggle_mods_on_color, 10);
+    update();
 
     addActionListener(this);
     addMouseListener(this);
@@ -35,6 +37,10 @@ public final class ToggleModsButton extends RoundedFlatButton implements ActionL
   @Override
   public void actionPerformed(ActionEvent e) {
     toggled = !toggled;
+
+    SettingsManager.settings.persistenceSettings.modsEnabled = toggled;
+    SettingsManager.writeSettings();
+
     update();
     ModsPanel.updateModList();
   }

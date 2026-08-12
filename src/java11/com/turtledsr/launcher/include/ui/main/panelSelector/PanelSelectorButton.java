@@ -21,7 +21,7 @@ import javax.swing.SwingConstants;
 
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.main.MainFrame;
+import com.turtledsr.launcher.include.ui.main.rootPanels.MainPanel;
 
 public final class PanelSelectorButton extends JPanel implements MouseListener {
   private JLabel label;
@@ -74,7 +74,7 @@ public final class PanelSelectorButton extends JPanel implements MouseListener {
   }
 
   public void update() {
-    if(MainFrame.selectedPanel == boundPanel) {
+    if(MainPanel.selectedPanel == boundPanel) {
       sep.setForeground(StyleManager.selector_underline_color);
       sep.setBorder(BorderFactory.createLineBorder(StyleManager.selector_underline_color, 10));
     } else {
@@ -97,7 +97,7 @@ public final class PanelSelectorButton extends JPanel implements MouseListener {
   public void mouseReleased(MouseEvent e) { //use mouseReleased to avoid missed clicks
     if(contains(e.getPoint())) {
       if(boundPanel == -1) return;
-      MainFrame.setSelectedPanel(boundPanel);
+      MainPanel.setSelectedPanel(boundPanel);
     }
   }
   

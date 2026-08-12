@@ -11,6 +11,14 @@ build folder=".build": build-J build-C
 debug: 
   @just build .debug
 
+#build everything and test launch the exe
+[group: 'build']
+[windows]
+test folder=".debug": build-J build-C 
+  @just copy {{folder}}
+  @build/{{folder}}/ITT-launcher.exe
+  @just zip {{folder}}
+
 #build java launcher
 [group: 'java']
 [windows]

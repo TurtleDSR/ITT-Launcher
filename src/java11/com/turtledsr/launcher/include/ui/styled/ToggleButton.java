@@ -28,13 +28,17 @@ public class ToggleButton extends JPanel implements MouseListener {
   protected JPanel off;
 
   public ToggleButton() {
-    this(false);
+    this(false, 1f);
   }
 
   public ToggleButton(boolean toggled) {
+    this(toggled, 1f);
+  }
+
+  public ToggleButton(boolean toggled, float scale) {
     super(new GridBagLayout());
 
-    setPreferredSize(new Dimension(30, 18));
+    setPreferredSize(new Dimension((int)(30 * scale), (int)(18 * scale)));
     setBackground(StyleManager.toggle_background_color);
 
     GridBagConstraints c = new GridBagConstraints();

@@ -31,21 +31,6 @@ public final class LaunchButtonPanel extends JPanel {
     setPreferredSize(new Dimension(StyleManager.PANEL_SIZE.width, StyleManager.LAUNCH_PANEL_HEIGHT));
     setBackground(StyleManager.background_color);
 
-    //if(launchRankedButton == null) launchRankedButton = new RoundedFlatButton("Play Ranked", StyleManager.launch_button_color, 10);
-    //launchRankedButton.setPreferredSize(new Dimension(125, StyleManager.LAUNCH_PANEL_HEIGHT - 15));
-    //launchRankedButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
-    //launchRankedButton.addMouseListener(new MouseAdapter() {
-    //  @Override
-    //  public void mouseEntered(MouseEvent e) {
-    //    launchRankedButton.setBackground(StyleManager.launch_button_hover_color);
-    //  }
-    //
-    //  @Override
-    //  public void mouseExited(MouseEvent e) {
-    //    launchRankedButton.setBackground(StyleManager.launch_button_color);
-    //  }
-    //});
-
     if(toggleModsButton == null) toggleModsButton = new ToggleModsButton();
     toggleModsButton.setPreferredSize(new Dimension(125, StyleManager.LAUNCH_PANEL_HEIGHT - 15));
     toggleModsButton.setFont(new Font("Segoe UI", Font.BOLD, 16));

@@ -10,6 +10,7 @@ import javax.swing.ImageIcon;
 
 import com.turtledsr.launcher.include.ui.helper.ImageManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
+import com.turtledsr.launcher.include.ui.main.Window;
 import com.turtledsr.launcher.include.ui.styled.FlatButton;
 
 public class SettingsButton extends FlatButton {
@@ -39,6 +40,11 @@ public class SettingsButton extends FlatButton {
     addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        if(Window.activePanel != Window.SETTINGS) {
+          Window.setActivePanel(Window.SETTINGS);
+        } else {
+          Window.setActivePanel(Window.lastActivePanel);
+        }
       }
     });
   }
