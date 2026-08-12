@@ -76,3 +76,7 @@ copy folder=".build":
   @#copy exe's
   @echo copy exe
   cp build/c/*.exe build/{{folder}}/
+
+  @#copy readme
+  @echo copy exe
+  cp readme.md build/{{folder}}/
