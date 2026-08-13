@@ -8,12 +8,12 @@ import java.io.InputStream;
 
 import com.turtledsr.launcher.include.config.SettingsManager;
 import com.turtledsr.launcher.include.control.Autosplitter;
+import com.turtledsr.launcher.include.control.Process;
 import com.turtledsr.launcher.include.control.TimerHandler;
 import com.turtledsr.launcher.include.engine.ShaderManager;
 import com.turtledsr.launcher.include.engine.SingleInstanceManager;
 import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
-import com.turtledsr.launcher.include.process.Process;
 import com.turtledsr.launcher.include.ui.debug.LogPanel;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.ImageManager;

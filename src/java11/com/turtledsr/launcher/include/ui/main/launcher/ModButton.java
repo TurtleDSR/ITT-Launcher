@@ -19,7 +19,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-import com.turtledsr.launcher.include.process.Process;
+import com.turtledsr.launcher.include.control.Process;
 import com.turtledsr.launcher.include.struct.Mod;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;

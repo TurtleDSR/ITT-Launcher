@@ -10,7 +10,7 @@ import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
-import com.turtledsr.launcher.include.process.Process;
+import com.turtledsr.launcher.include.control.Process;
 
 public class SingleInstanceManager {
   private static File lockFile;

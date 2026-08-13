@@ -2,7 +2,7 @@
 Helper class for managing processes and similar low level machine control
 */
 
-package com.turtledsr.launcher.include.process;
+package com.turtledsr.launcher.include.control;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.Scanner;
@@ -24,6 +26,9 @@ import java.util.stream.Stream;
 
 import javax.swing.SwingWorker;
 
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.Kernel32;
@@ -32,11 +37,11 @@ import com.sun.jna.platform.win32.WinReg;
 import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.turtledsr.launcher.Main;
-import com.turtledsr.launcher.include.control.FileHelper;
 import com.turtledsr.launcher.include.engine.LivesplitManager;
 import com.turtledsr.launcher.include.engine.Logs;
 import com.turtledsr.launcher.include.engine.ZipManager;
 import com.turtledsr.launcher.include.engine.events.EventManager;
+import com.turtledsr.launcher.include.struct.ITTASKeybinds;
 import com.turtledsr.launcher.include.struct.Mod;
 import com.turtledsr.launcher.include.ui.main.launcher.ModsPanel;
 import com.turtledsr.launcher.include.ui.main.launcher.ToggleModsButton;
@@ -124,20 +129,60 @@ public final class Process {
 
           //patch speedtools to be on by default
           Path speedSettingsPath = Paths.get(getGameDirectory(), "Nuts/Script/Speed/SpeedSettings.as");
+          if(Files.exists(speedSettingsPath)) {
 
-          if (Files.exists(speedSettingsPath)) {
-            Logs.log("Speedtools exists");
-            List<String> lines = Files.readAllLines(speedSettingsPath);
+            File installerPath = new File(System.getenv("LOCALAPPDATA"), "ITTAS-Installer/");
+            if(installerPath.exists()) {
+              try{
+                File newestSubfolder = Arrays.stream(installerPath.listFiles(File::isDirectory)).max(Comparator.comparingLong(File::lastModified)).orElse(null);
+                File configFile = new File(newestSubfolder, "1.0.0.0/user.config");
 
-            if (!lines.isEmpty()) {
-              lines.set(0, "const bool SpeedToolsActiveOnLaunch = true;");
-              Files.write(speedSettingsPath, lines);
-              Logs.log("Speedtools updated successfully");
+                Element root = FileHelper.readFileAsXMLTree(configFile.toPath());
+                Element userSettingsNode = (Element)(root.getElementsByTagName("userSettings").item(0));
+                Element ITTAS_InstallerPropertiesSettingsNode = (Element)(userSettingsNode.getElementsByTagName("ITTAS_Installer.Properties.Settings").item(0));
+
+                NodeList settingNodes = ITTAS_InstallerPropertiesSettingsNode.getElementsByTagName("setting");
+
+                boolean speedtoolsActiveOnLaunch = ((Element) settingNodes.item(1)).getElementsByTagName("value").item(0).getTextContent().equals("True");
+                
+                int save1 = Integer.parseInt(((Element) settingNodes.item(2)).getElementsByTagName("value").item(0).getTextContent());
+                int save2 = Integer.parseInt(((Element) settingNodes.item(3)).getElementsByTagName("value").item(0).getTextContent());
+
+                int load1 = Integer.parseInt(((Element) settingNodes.item(4)).getElementsByTagName("value").item(0).getTextContent());
+                int load2 = Integer.parseInt(((Element) settingNodes.item(5)).getElementsByTagName("value").item(0).getTextContent());
+
+                int teleport1 = Integer.parseInt(((Element) settingNodes.item(6)).getElementsByTagName("value").item(0).getTextContent());
+                int teleport2 = Integer.parseInt(((Element) settingNodes.item(7)).getElementsByTagName("value").item(0).getTextContent());
+                
+                List<String> lines = new ArrayList<String>(8);
+                for (int i = 0; i < 8; i++) {
+                  lines.add("");
+                }
+
+                lines.set(0, "const bool SpeedToolsActiveOnLaunch = " + speedtoolsActiveOnLaunch + ";");
+
+                lines.set(2, "const FName SaveState1 = ActionNames::" + ITTASKeybinds.actionNames[save1] + ";");
+                lines.set(3, "const FName SaveState2 = ActionNames::" + ITTASKeybinds.actionNames[save2] + ";");
+
+                lines.set(4, "const FName LoadState1 = ActionNames::" + ITTASKeybinds.actionNames[load1] + ";");
+                lines.set(5, "const FName LoadState2 = ActionNames::" + ITTASKeybinds.actionNames[load2] + ";");
+
+                lines.set(6, "const FName TeleportOther1 = ActionNames::" + ITTASKeybinds.actionNames[teleport1] + ";");
+                lines.set(7, "const FName TeleportOther2 = ActionNames::" + ITTASKeybinds.actionNames[teleport2] + ";");
+                
+                FileHelper.saveFileFromLines(speedSettingsPath, lines);
+              } catch(Exception e) {
+                Logs.logError("Failed to patch speedtools: " + e.getMessage(), "PROCESS");
+              }
             } else {
-              Logs.log("Speedtools file was empty, nothing patched");
+              List<String> lines = FileHelper.readFileAsLines(speedSettingsPath);
+
+              lines.set(0, "const bool SpeedToolsActiveOnLaunch = true;");
+
+              FileHelper.saveFileFromLines(speedSettingsPath, lines);
             }
-          } else {
-            Logs.log("Speedtools file not found at: " + speedSettingsPath.toAbsolutePath());
+
+            Logs.log("Speedtools succesfully patched", "PROCESS");
           }
         } else {
           enableScriptCache();

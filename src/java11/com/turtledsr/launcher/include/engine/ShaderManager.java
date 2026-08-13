@@ -14,9 +14,9 @@ import java.nio.file.StandardCopyOption;
 import javax.swing.JOptionPane;
 
 import com.turtledsr.launcher.Main;
+import com.turtledsr.launcher.include.control.Process;
 import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
-import com.turtledsr.launcher.include.process.Process;
 
 public final class ShaderManager {
   private static Path shaderFolder = Paths.get("dx12/");

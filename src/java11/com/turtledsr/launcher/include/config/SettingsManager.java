@@ -10,8 +10,8 @@ import java.io.File;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.turtledsr.launcher.include.control.Process;
 import com.turtledsr.launcher.include.engine.Logs;
-import com.turtledsr.launcher.include.process.Process;
 
 public final class SettingsManager {
   public static Settings settings;

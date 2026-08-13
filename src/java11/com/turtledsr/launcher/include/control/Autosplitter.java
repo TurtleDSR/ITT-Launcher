@@ -23,7 +23,6 @@ import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.turtledsr.launcher.Main;
 import com.turtledsr.launcher.include.engine.Logs;
-import com.turtledsr.launcher.include.process.Process;
 
 
 public final class Autosplitter {
