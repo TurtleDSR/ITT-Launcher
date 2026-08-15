@@ -25,7 +25,6 @@ public final class Settings {
   }
 
   public static class UISettings {
-    public int UIScale = 1;
     public boolean preserveWindowPosition = true;
   }
 
@@ -33,6 +32,6 @@ public final class Settings {
     public boolean checkForUpdates = true;
     public boolean devMode = false;
     public boolean showCustomTitleBar = true;
-    public int socketPort = 41000;
+    public int socketPort = 51000;
   }
 }

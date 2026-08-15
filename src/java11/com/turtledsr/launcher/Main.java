@@ -213,7 +213,7 @@ public final class Main {
 
   private static void startServerSocketThread() {
     try {
-      Logs.log("Starting ServerSocket", "SERVER_SOCKET_THREAD");
+      Logs.log("Starting ServerSocket on Port " + SettingsManager.settings.developerSettings.socketPort, "SERVER_SOCKET_THREAD");
 
       serverSocket = new ServerSocket(SettingsManager.settings.developerSettings.socketPort);
       socketThreadPool = Executors.newCachedThreadPool();

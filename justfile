@@ -87,4 +87,4 @@ copy folder=".build":
 [group: 'util']
 [windows]
 shutdown-app:
-  @echo "shutdown_application" > /dev/tcp/localhost/41000 &
+  @echo "shutdown_application" > /dev/tcp/localhost/51000 &
