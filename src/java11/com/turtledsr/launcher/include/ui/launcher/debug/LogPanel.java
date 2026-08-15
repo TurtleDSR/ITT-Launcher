@@ -4,7 +4,7 @@ Panel for displaying log information
 Gets its logs from the Logs class functions
 */
 
-package com.turtledsr.launcher.include.ui.debug;
+package com.turtledsr.launcher.include.ui.launcher.debug;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

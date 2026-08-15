@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 
 import javax.swing.SwingWorker;
 
-import com.turtledsr.launcher.include.ui.main.rootPanels.MainPanel;
+import com.turtledsr.launcher.include.ui.launcher.rootPanels.MainPanel;
 
 public final class Logs {
   public static void log(Object message) {

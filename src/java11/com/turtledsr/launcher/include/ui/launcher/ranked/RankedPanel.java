@@ -1,4 +1,4 @@
-package com.turtledsr.launcher.include.ui.main.ranked;
+package com.turtledsr.launcher.include.ui.launcher.ranked;
 
 import java.awt.GridBagLayout;
 

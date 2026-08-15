@@ -4,21 +4,21 @@ Main Root UI Panel
 The most used root panel, controls all the general use tabs and UI
 */
 
-package com.turtledsr.launcher.include.ui.main.rootPanels;
+package com.turtledsr.launcher.include.ui.launcher.rootPanels;
 
 import com.turtledsr.launcher.include.config.SettingsManager;
-import com.turtledsr.launcher.include.ui.debug.LogPanel;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.main.launcher.LauncherPanel;
-import com.turtledsr.launcher.include.ui.main.panelSelector.PanelSelector;
-import com.turtledsr.launcher.include.ui.main.ranked.RankedPanel;
-import com.turtledsr.launcher.include.ui.main.tools.ToolsPanel;
+import com.turtledsr.launcher.include.ui.launcher.debug.LogPanel;
+import com.turtledsr.launcher.include.ui.launcher.launch.LauncherPanel;
+import com.turtledsr.launcher.include.ui.launcher.panelSelector.PanelSelector;
+import com.turtledsr.launcher.include.ui.launcher.ranked.RankedPanel;
+import com.turtledsr.launcher.include.ui.launcher.tools.ToolsPanel;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-public final class MainPanel extends RootPanel {
+public final class MainPanel extends AbstractRootPanel {
   public static final int LAUNCHER = 0;
   public static final int RANKED = 1;
   public static final int TOOLS = 2;

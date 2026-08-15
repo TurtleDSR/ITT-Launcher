@@ -1,4 +1,4 @@
-package com.turtledsr.launcher.include.ui.main.titleBar;
+package com.turtledsr.launcher.include.ui.launcher.titleBar;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 
 import com.turtledsr.launcher.include.ui.helper.ImageManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.main.Window;
+import com.turtledsr.launcher.include.ui.launcher.Window;
 import com.turtledsr.launcher.include.ui.styled.FlatButton;
 
 public class SettingsButton extends FlatButton {

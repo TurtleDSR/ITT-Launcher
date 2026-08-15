@@ -2,7 +2,7 @@
 The panel that selects which panel you are currently looking at
 */
 
-package com.turtledsr.launcher.include.ui.main.panelSelector;
+package com.turtledsr.launcher.include.ui.launcher.panelSelector;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -22,7 +22,7 @@ import com.turtledsr.launcher.include.control.Process;
 import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.main.rootPanels.MainPanel;
+import com.turtledsr.launcher.include.ui.launcher.rootPanels.MainPanel;
 import com.turtledsr.launcher.include.ui.styled.RoundedFlatButton;
 
 public final class PanelSelector extends JPanel {

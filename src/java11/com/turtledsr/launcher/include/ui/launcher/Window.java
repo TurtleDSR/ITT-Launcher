@@ -4,7 +4,7 @@ UI Window
 Controls all of the UI, and is the starting point for visual rendering on launch
 */
 
-package com.turtledsr.launcher.include.ui.main;
+package com.turtledsr.launcher.include.ui.launcher;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -21,9 +21,9 @@ import com.turtledsr.launcher.Main;
 import com.turtledsr.launcher.include.config.SettingsManager;
 import com.turtledsr.launcher.include.ui.helper.ImageManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.main.rootPanels.MainPanel;
-import com.turtledsr.launcher.include.ui.main.rootPanels.SettingsPanel;
-import com.turtledsr.launcher.include.ui.main.titleBar.TitleBar;
+import com.turtledsr.launcher.include.ui.launcher.rootPanels.MainPanel;
+import com.turtledsr.launcher.include.ui.launcher.rootPanels.SettingsPanel;
+import com.turtledsr.launcher.include.ui.launcher.titleBar.TitleBar;
 
 public final class Window extends JFrame {
   public static final double CORNER_ROUNDING = 12;
@@ -94,7 +94,11 @@ public final class Window extends JFrame {
     
     pack();
     
-    setLocation((screen.width / 2) - (getWidth() / 2), (screen.height / 2) - (getHeight() / 2)); //go to center of the screen
+    if(!SettingsManager.settings.uiSettings.preserveWindowPosition || SettingsManager.settings.persistenceSettings.windowPosition == null || SettingsManager.settings.persistenceSettings.windowPosition.x == null) {
+      setLocation((screen.width / 2) - (getWidth() / 2), (screen.height / 2) - (getHeight() / 2)); //go to center of the screen
+    } else {
+      setLocation(SettingsManager.settings.persistenceSettings.windowPosition.x, SettingsManager.settings.persistenceSettings.windowPosition.y); //go to preserved position
+    }
   }
 
   private static void setPanelsInvis() {

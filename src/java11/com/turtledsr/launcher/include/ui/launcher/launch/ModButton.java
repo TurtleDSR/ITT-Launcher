@@ -2,7 +2,7 @@
 The panel that shows the mod name and a toggle switch 
 */
 
-package com.turtledsr.launcher.include.ui.main.launcher;
+package com.turtledsr.launcher.include.ui.launcher.launch;
 
 import java.awt.Cursor;
 import java.awt.Dimension;

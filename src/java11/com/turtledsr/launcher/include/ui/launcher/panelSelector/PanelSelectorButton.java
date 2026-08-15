@@ -4,7 +4,7 @@ Button for selecting the panel
 Uses a JPanel under the hood for better styling
 */
 
-package com.turtledsr.launcher.include.ui.main.panelSelector;
+package com.turtledsr.launcher.include.ui.launcher.panelSelector;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -21,7 +21,7 @@ import javax.swing.SwingConstants;
 
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.main.rootPanels.MainPanel;
+import com.turtledsr.launcher.include.ui.launcher.rootPanels.MainPanel;
 
 public final class PanelSelectorButton extends JPanel implements MouseListener {
   private JLabel label;

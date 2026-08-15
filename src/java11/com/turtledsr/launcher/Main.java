@@ -27,11 +27,11 @@ import com.turtledsr.launcher.include.engine.ShaderManager;
 import com.turtledsr.launcher.include.engine.SingleInstanceManager;
 import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
-import com.turtledsr.launcher.include.ui.debug.LogPanel;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.ImageManager;
-import com.turtledsr.launcher.include.ui.main.Window;
-import com.turtledsr.launcher.include.ui.main.rootPanels.MainPanel;
+import com.turtledsr.launcher.include.ui.launcher.Window;
+import com.turtledsr.launcher.include.ui.launcher.debug.LogPanel;
+import com.turtledsr.launcher.include.ui.launcher.rootPanels.MainPanel;
 
 public final class Main {
   public static final String TITLE = "It Takes Two Launcher";
@@ -61,15 +61,17 @@ public final class Main {
   public static void main(String[] args) throws Exception {
     MainPanel.createLogPanel(); //initialize log panel first so we can log things
 
-    SettingsManager.loadSettings(); //load settings from settings.json file
-
     if(SingleInstanceManager.checkIfAlreadyRunning()) { //check if program is already running
+      SettingsManager.loadSettings(false); //dont hook settings to update on close
+
       Socket messenger = new Socket("localhost", SettingsManager.settings.developerSettings.socketPort); //tell launcher to restore window if its in the tray
       messenger.getOutputStream().write("restore_window".getBytes());
       messenger.getOutputStream().flush();
       messenger.close();
       System.exit(0); //close program
     };
+
+    SettingsManager.loadSettings(); //load settings from settings.json file
 
     serverThread = new Thread(() -> startServerSocketThread());
     serverThread.setDaemon(true);
@@ -209,6 +211,30 @@ public final class Main {
     }
   }
 
+  private static void startServerSocketThread() {
+    try {
+      Logs.log("Starting ServerSocket", "SERVER_SOCKET_THREAD");
+
+      serverSocket = new ServerSocket(SettingsManager.settings.developerSettings.socketPort);
+      socketThreadPool = Executors.newCachedThreadPool();
+
+      while(serverThreadSafe) {
+        Socket client = serverSocket.accept();
+        if(socketThreadPool != null) {
+          socketThreadPool.submit(() -> handleClientSocket(client));
+        } else {
+          client.close();
+        }
+      }
+    } catch(Exception e) {
+      Logs.logError("Server Socket Failure: " + e.getLocalizedMessage(), "SERVER_SOCKET_THREAD");
+      socketThreadPool.shutdown();
+      socketThreadPool = null;
+
+      serverThreadSafe = false;
+    }
+  }
+
   private static void createTrayMenu() {
     trayMenu = new PopupMenu();
 
@@ -246,29 +272,5 @@ public final class Main {
     trayMenu.add(exitButton);
 
     if(trayicon != null) trayicon.setPopupMenu(trayMenu);
-  }
-
-  private static void startServerSocketThread() {
-    try {
-      Logs.log("Starting ServerSocket", "SERVER_SOCKET_THREAD");
-
-      serverSocket = new ServerSocket(SettingsManager.settings.developerSettings.socketPort);
-      socketThreadPool = Executors.newCachedThreadPool();
-
-      while(serverThreadSafe) {
-        Socket client = serverSocket.accept();
-        if(socketThreadPool != null) {
-          socketThreadPool.submit(() -> handleClientSocket(client));
-        } else {
-          client.close();
-        }
-      }
-    } catch(Exception e) {
-      Logs.logError("Server Socket Failure: " + e.getLocalizedMessage(), "SERVER_SOCKET_THREAD");
-      socketThreadPool.shutdown();
-      socketThreadPool = null;
-
-      serverThreadSafe = false;
-    }
   }
 }

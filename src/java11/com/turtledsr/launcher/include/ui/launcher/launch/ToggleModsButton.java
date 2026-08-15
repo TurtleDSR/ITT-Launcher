@@ -1,7 +1,7 @@
 /*
 Button for toggling mods on and off
 */
-package com.turtledsr.launcher.include.ui.main.launcher;
+package com.turtledsr.launcher.include.ui.launcher.launch;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

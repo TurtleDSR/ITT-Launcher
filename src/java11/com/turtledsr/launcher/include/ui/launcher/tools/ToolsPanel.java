@@ -2,7 +2,7 @@
 Panel that holds tools for the game
 */
 
-package com.turtledsr.launcher.include.ui.main.tools;
+package com.turtledsr.launcher.include.ui.launcher.tools;
 
 import java.awt.Dimension;
 import java.awt.Font;

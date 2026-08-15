@@ -1,4 +1,4 @@
-package com.turtledsr.launcher.include.ui.main.launcher;
+package com.turtledsr.launcher.include.ui.launcher.launch;
 
 import java.awt.Desktop;
 import java.awt.Dimension;

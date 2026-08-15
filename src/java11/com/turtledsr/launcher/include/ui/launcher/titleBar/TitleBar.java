@@ -2,7 +2,7 @@
 Title Bar UI Panel
 */
 
-package com.turtledsr.launcher.include.ui.main.titleBar;
+package com.turtledsr.launcher.include.ui.launcher.titleBar;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -16,9 +16,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.turtledsr.launcher.Main;
+import com.turtledsr.launcher.include.config.SettingsManager;
+import com.turtledsr.launcher.include.config.Settings.PersistenceSettings;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.main.Window;
+import com.turtledsr.launcher.include.ui.launcher.Window;
 
 public final class TitleBar extends JPanel {
   private static JLabel titleLabel;
@@ -70,12 +72,29 @@ public final class TitleBar extends JPanel {
           xOffset = e.getX();
         }
       }
+
+      @Override
+      public void mouseReleased(MouseEvent e) {
+        if(e.getButton() == MouseEvent.BUTTON1) {
+          if(SettingsManager.settings.uiSettings.preserveWindowPosition) {
+            if(SettingsManager.settings.persistenceSettings.windowPosition == null) SettingsManager.settings.persistenceSettings.windowPosition = new PersistenceSettings.WindowPosition();
+            SettingsManager.settings.persistenceSettings.windowPosition.x = Main.window.getLocation().x;
+            SettingsManager.settings.persistenceSettings.windowPosition.y = Main.window.getLocation().y;
+            SettingsManager.writeSettings();
+          }
+        }
+      }
     });
 
     addMouseMotionListener(new MouseAdapter() {
       @Override
       public void mouseDragged(MouseEvent e) {
-        if(Window.draggable && (e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) Main.window.setLocation(e.getXOnScreen() - xOffset, e.getYOnScreen() - yOffset);
+        if(Window.draggable && (e.getModifiersEx() & MouseEvent.BUTTON1_DOWN_MASK) != 0) {
+          int x = e.getXOnScreen() - xOffset;
+          int y = e.getYOnScreen() - yOffset;
+
+          Main.window.setLocation(x, y);
+        }
       }
     });
   }

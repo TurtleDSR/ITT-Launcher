@@ -2,7 +2,7 @@
 Main panel for the game/livesplit launcher
 */
 
-package com.turtledsr.launcher.include.ui.main.launcher;
+package com.turtledsr.launcher.include.ui.launcher.launch;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

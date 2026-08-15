@@ -22,9 +22,13 @@ public final class SettingsManager {
   private static ShutdownHook hook;
 
   public static void loadSettings() {
+    loadSettings(true);
+  }
+
+  public static void loadSettings(boolean shutdownHook) {
     mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-    if(hook == null) {
+    if(shutdownHook && hook == null) {
       hook = new ShutdownHook();
       Runtime.getRuntime().addShutdownHook(hook);
     }

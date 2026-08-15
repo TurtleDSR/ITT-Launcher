@@ -43,8 +43,8 @@ import com.turtledsr.launcher.include.engine.ZipManager;
 import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.struct.ITTASKeybinds;
 import com.turtledsr.launcher.include.struct.Mod;
-import com.turtledsr.launcher.include.ui.main.launcher.ModsPanel;
-import com.turtledsr.launcher.include.ui.main.launcher.ToggleModsButton;
+import com.turtledsr.launcher.include.ui.launcher.launch.ModsPanel;
+import com.turtledsr.launcher.include.ui.launcher.launch.ToggleModsButton;
 
 public final class Process {
   private static String gameDirectory;

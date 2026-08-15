@@ -2,7 +2,7 @@
 Panel used for the settings menu
 */
 
-package com.turtledsr.launcher.include.ui.main.rootPanels;
+package com.turtledsr.launcher.include.ui.launcher.rootPanels;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -16,7 +16,7 @@ import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.styled.settings.ToggleField;
 
-public final class SettingsPanel extends RootPanel {
+public final class SettingsPanel extends AbstractRootPanel {
   private static Dimension fieldSize = new Dimension(130, 22);
 
   public static ToggleField devModeField;
