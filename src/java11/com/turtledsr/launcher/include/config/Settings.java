@@ -19,5 +19,6 @@ public final class Settings {
   public static class DeveloperSettings {
     public Boolean devMode = false;
     public Boolean showCustomTitleBar = true;
+    public int socketPort = 41000;
   }
 }

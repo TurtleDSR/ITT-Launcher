@@ -111,6 +111,8 @@ public final class Process {
     new SwingWorker<Void, Void>() {
       @Override
       protected Void doInBackground() throws Exception {
+        EventManager.triggerEvent("game_starting"); //startup event
+
         //clean scripts
         Logs.log("Cleaning scripts folder", "PROCESS");
         FileHelper.deleteSubfolders(getGameDirectory() + "Nuts/Script/");
@@ -213,7 +215,7 @@ public final class Process {
       new ProcessBuilder(command).start();
 
       Logs.log("Successfully launched game", "PROCESS");
-      EventManager.triggerEvent("game_launched");
+      EventManager.triggerEvent("game_started");
       return true;
     } catch (Exception e) {
       Logs.logError("Failed to launch game: " + e.getMessage(), "PROCESS");

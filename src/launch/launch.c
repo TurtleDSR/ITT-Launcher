@@ -3,8 +3,11 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <shlobj.h>
 
 int main() {
+  SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL); //update icon
+
   char exePath[MAX_PATH];
   char dir[MAX_PATH];
   char commandLine[MAX_PATH * 2];

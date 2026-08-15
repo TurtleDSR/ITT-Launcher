@@ -88,7 +88,6 @@ public final class PanelSelector extends JPanel {
       @Override
       public void actionPerformed(ActionEvent e) {
         if(launchGameButton.getText().equals("Launch")) { //launch
-          PanelSelector.launchGameButton.setText("Starting...");
           Process.launchItTakesTwoEx();
         }
       }
@@ -97,9 +96,16 @@ public final class PanelSelector extends JPanel {
     EventManager.addListener(new EventListener() {
       @Override
       public void eventTriggered() {
+        PanelSelector.launchGameButton.setText("Starting...");
+      }
+    }, "game_starting");
+
+    EventManager.addListener(new EventListener() {
+      @Override
+      public void eventTriggered() {
         PanelSelector.launchGameButton.setText("Started");
       }
-    }, "game_launched");
+    }, "game_started");
 
     EventManager.addListener(new EventListener() {
       @Override

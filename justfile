@@ -1,6 +1,7 @@
 #build both java launcher and c wrapper executable in the specified dir (default: .build)
 [group: 'build']
 [windows]
+[parallel]
 build folder=".build": build-J build-C 
   @just copy {{folder}}
   @just zip {{folder}}
@@ -14,9 +15,10 @@ debug:
 #build everything and test launch the exe
 [group: 'build']
 [windows]
-test folder=".debug": build-J build-C 
+[parallel]
+test folder=".debug": shutdown-app build-J build-C
   @just copy {{folder}}
-  @build/{{folder}}/ITT-launcher.exe
+  @build/{{folder}}/ITT-launcher.exe &
   @just zip {{folder}}
 
 #build java launcher
@@ -30,30 +32,30 @@ build-J:
 [group: 'exe']
 [windows]
 build-C:
+  @#create icon image for the exe
+  @just update-ico &
+
   @#create missing directories
   @[ -d build/c ] || mkdir -p build/c
   @[ -d build/tmp/c ] || mkdir -p build/tmp/c
-
-  @#create icon image for the exe
-  @[ -f src/launch/icon.ico ] || just update-ico
 
   @#compile resources
   llvm-rc src/launch/launch.rc -fo build/tmp/c/launch.res
 
   @#compile c
-  clang -O3 src/launch/launch.c build/tmp/c/launch.res -o build/c/ITT-launcher.exe -static
+  clang -O3 src/launch/launch.c build/tmp/c/launch.res -o build/c/ITT-launcher.exe -static -lshell32
 
 #update executable icon
 [group: 'exe']
 [windows]
 update-ico:
-  magick src/java11/resources/img/icon.png src/launch/icon.ico
+  magick src/java11/resources/img/icon.png src/launch/icon.ico &
 
 #zip files
 [group: 'package']
 [windows]
 zip folder=".build":
-  ./zip.exe build/{{folder}}/ build/{{folder}}/ITT-launcher.zip
+  ./zip.exe build/{{folder}}/ build/{{folder}}/ITT-launcher.zip &
 
 #copy files
 [group: 'package']
@@ -67,16 +69,22 @@ copy folder=".build":
 
   @#copy jars
   @echo copy jar
-  cp build/libs/*.jar build/{{folder}}/
+  cp build/libs/*.jar build/{{folder}}/ &
 
   @#copy jre
   @echo copy jre
-  cp -r build/jre/ build/{{folder}}/
+  cp -r build/jre/ build/{{folder}}/ &
 
   @#copy exe's
   @echo copy exe
-  cp build/c/*.exe build/{{folder}}/
+  cp build/c/*.exe build/{{folder}}/ &
 
   @#copy readme
   @echo copy exe
-  cp readme.md build/{{folder}}/
+  cp readme.md build/{{folder}}/ &
+
+#attempt to close application if its open (assumes default port)
+[group: 'util']
+[windows]
+shutdown-app:
+  @echo "shutdown_application" > /dev/tcp/localhost/41000 &

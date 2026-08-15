@@ -12,6 +12,8 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 
+import com.turtledsr.launcher.Main;
+import com.turtledsr.launcher.include.control.Process;
 import com.turtledsr.launcher.include.engine.Logs;
 import com.turtledsr.launcher.include.ui.helper.ImageManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
@@ -45,8 +47,13 @@ public final class ExitButton extends FlatButton {
     addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        Logs.log("CLOSING APPLICATION", "EXITBUTTON");
-        System.exit(0);
+        if(Process.gameStatus == Process.STOPPED) { //stop launcher if game is stopped
+          Logs.log("CLOSING APPLICATION", "EXITBUTTON");
+          System.exit(0);
+        } else { //if game is running in any capacity hide to tray rather than close
+          Logs.log("HIDING APPLICATION", "EXITBUTTON");
+          Main.hideWindow();
+        }
       }
     });
   }
