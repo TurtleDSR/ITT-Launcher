@@ -16,7 +16,7 @@ import javax.swing.ImageIcon;
 import com.turtledsr.launcher.Main;
 import com.turtledsr.launcher.include.ui.helper.ImageManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.styled.FlatButton;
+import com.turtledsr.launcher.include.ui.styled.button.FlatButton;
 
 public final class MinimiseButton extends FlatButton {
   public MinimiseButton() {
@@ -30,6 +30,7 @@ public final class MinimiseButton extends FlatButton {
     }
 
     setPreferredSize(new Dimension(StyleManager.TITLEBAR_HEIGHT + 8, StyleManager.TITLEBAR_HEIGHT));
+    setMinimumSize(getPreferredSize());
 
     addMouseListener(new MouseAdapter() {
       @Override

@@ -12,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.styled.ToggleButton;
+import com.turtledsr.launcher.include.ui.styled.button.ToggleButton;
 
 public class ToggleField extends JPanel {
   public JLabel label;

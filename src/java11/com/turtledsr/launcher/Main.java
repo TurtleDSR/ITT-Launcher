@@ -32,6 +32,7 @@ import com.turtledsr.launcher.include.ui.helper.ImageManager;
 import com.turtledsr.launcher.include.ui.launcher.Window;
 import com.turtledsr.launcher.include.ui.launcher.debug.LogPanel;
 import com.turtledsr.launcher.include.ui.launcher.rootPanels.MainPanel;
+import com.turtledsr.launcher.include.ui.styled.messageBox.MessageBox;
 
 public final class Main {
   public static final String TITLE = "It Takes Two Launcher";
@@ -197,6 +198,14 @@ public final class Main {
       String input;
       while((input = reader.readLine()) != null) {
         Logs.log("ServerSocket Recieved Message: " + input, "SERVER_SOCKET_THREAD");
+
+        if(input.equalsIgnoreCase("show_debug_message")) {
+          new MessageBox("Debug", "Test Message!\n\nThe quick brown fox jumps over the lazy dog");
+        }
+
+        if(input.equalsIgnoreCase("hide_window")) {
+          hideWindow();
+        }
 
         if(input.equalsIgnoreCase("restore_window")) {
           restoreWindow();

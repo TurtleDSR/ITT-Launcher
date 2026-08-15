@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
 import com.turtledsr.launcher.include.ui.helper.ImageManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.launcher.Window;
-import com.turtledsr.launcher.include.ui.styled.FlatButton;
+import com.turtledsr.launcher.include.ui.styled.button.FlatButton;
 
 public class SettingsButton extends FlatButton {
   public SettingsButton() {
@@ -25,6 +25,7 @@ public class SettingsButton extends FlatButton {
     }
 
     setPreferredSize(new Dimension(StyleManager.TITLEBAR_HEIGHT + 8, StyleManager.TITLEBAR_HEIGHT));
+    setMinimumSize(getPreferredSize());
 
     addMouseListener(new MouseAdapter() {
       @Override

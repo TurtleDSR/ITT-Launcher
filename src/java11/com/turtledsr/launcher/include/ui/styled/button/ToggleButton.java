@@ -3,7 +3,7 @@ Toggle button class,
 The typical switch button
 */
 
-package com.turtledsr.launcher.include.ui.styled;
+package com.turtledsr.launcher.include.ui.styled.button;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

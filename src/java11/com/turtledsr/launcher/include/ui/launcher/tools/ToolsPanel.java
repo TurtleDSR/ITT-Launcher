@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 
 import com.turtledsr.launcher.include.engine.ShaderManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.styled.RoundedFlatButton;
+import com.turtledsr.launcher.include.ui.styled.button.RoundedFlatButton;
 
 public final class ToolsPanel extends JPanel {
   public static RoundedFlatButton shaderButton;

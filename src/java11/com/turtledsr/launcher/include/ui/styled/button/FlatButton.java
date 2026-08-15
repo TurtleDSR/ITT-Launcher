@@ -2,9 +2,10 @@
 Button styled to be modern and flat
 */
 
-package com.turtledsr.launcher.include.ui.styled;
+package com.turtledsr.launcher.include.ui.styled.button;
 
 import java.awt.Color;
+import java.awt.Insets;
 
 import javax.swing.Action;
 
@@ -57,5 +58,6 @@ public class FlatButton extends JButton {
     setOpaque(true);
     setFocusable(false);
     setForeground(StyleManager.foreground_color);
+    setMargin(new Insets(0, 0, 0, 0));
   }
 }

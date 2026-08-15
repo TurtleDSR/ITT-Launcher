@@ -10,7 +10,7 @@ import java.awt.event.MouseListener;
 
 import com.turtledsr.launcher.include.config.SettingsManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.styled.RoundedFlatButton;
+import com.turtledsr.launcher.include.ui.styled.button.RoundedFlatButton;
 
 public final class ToggleModsButton extends RoundedFlatButton implements ActionListener, MouseListener {
   public static boolean toggled = SettingsManager.settings.persistenceSettings.modsEnabled;

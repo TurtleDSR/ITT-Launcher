@@ -2,7 +2,7 @@
 Rounded Jpanel for styled paneling
 */
 
-package com.turtledsr.launcher.include.ui.styled;
+package com.turtledsr.launcher.include.ui.styled.panel;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;

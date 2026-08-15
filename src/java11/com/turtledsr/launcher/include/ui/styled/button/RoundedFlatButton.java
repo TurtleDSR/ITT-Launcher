@@ -2,7 +2,7 @@
 Button styled to be modern and flat
 */
 
-package com.turtledsr.launcher.include.ui.styled;
+package com.turtledsr.launcher.include.ui.styled.button;
 
 import java.awt.Color;
 import java.awt.Graphics;

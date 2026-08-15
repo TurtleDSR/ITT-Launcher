@@ -17,7 +17,7 @@ import javax.swing.JPanel;
 import com.turtledsr.launcher.include.control.Process;
 import com.turtledsr.launcher.include.engine.Logs;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.styled.RoundedFlatButton;
+import com.turtledsr.launcher.include.ui.styled.button.RoundedFlatButton;
 
 public final class LaunchButtonPanel extends JPanel {
   public static RoundedFlatButton launchRankedButton;

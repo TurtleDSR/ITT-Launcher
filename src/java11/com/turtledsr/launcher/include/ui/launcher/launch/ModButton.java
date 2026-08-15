@@ -23,7 +23,7 @@ import com.turtledsr.launcher.include.control.Process;
 import com.turtledsr.launcher.include.struct.Mod;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.styled.RoundedPanel;
+import com.turtledsr.launcher.include.ui.styled.panel.RoundedPanel;
 
 public final class ModButton extends RoundedPanel implements ActionListener {
   public Mod mod;

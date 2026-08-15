@@ -1,7 +1,7 @@
 package com.turtledsr.launcher.include.ui.launcher.launch;
 
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
-import com.turtledsr.launcher.include.ui.styled.ToggleButton;
+import com.turtledsr.launcher.include.ui.styled.button.ToggleButton;
 
 public final class ModToggleButton extends ToggleButton {
   ModToggleButton(boolean toggled) {

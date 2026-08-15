@@ -1,4 +1,4 @@
-package com.turtledsr.launcher.include.ui.styled;
+package com.turtledsr.launcher.include.ui.styled.panel;
 
 import java.awt.Color;
 import java.awt.Dimension;

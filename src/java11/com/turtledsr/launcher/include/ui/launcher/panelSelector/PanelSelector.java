@@ -23,7 +23,7 @@ import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.launcher.rootPanels.MainPanel;
-import com.turtledsr.launcher.include.ui.styled.RoundedFlatButton;
+import com.turtledsr.launcher.include.ui.styled.button.RoundedFlatButton;
 
 public final class PanelSelector extends JPanel {
   private static PanelSelectorButton launcherButton;
