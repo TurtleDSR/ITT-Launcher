@@ -2,7 +2,7 @@
 [group: 'build']
 [windows]
 [parallel]
-build folder=".build": build-J build-C 
+build folder=".build": shutdown-app build-J build-C 
   @just copy {{folder}}
   @just zip {{folder}}
 
