@@ -5,3 +5,4 @@ BUILD/
 bin/
 run.bat
 gradle.properties
+planned_features.txt
