@@ -14,14 +14,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.turtledsr.launcher.Main;
 import com.turtledsr.launcher.include.engine.ShaderManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.styled.button.RoundedFlatButton;
 
 public final class ToolsPanel extends JPanel {
   public static RoundedFlatButton shaderButton;
+  public static RoundedFlatButton updateCheckButton;
 
   public ToolsPanel() {
     super(new GridBagLayout());
@@ -35,7 +38,7 @@ public final class ToolsPanel extends JPanel {
     c.gridx = 0;
     c.gridy = 0;
     c.weightx = 1;
-    c.weighty = 1;
+    c.weighty = 0;
 
     if(shaderButton == null) shaderButton = new RoundedFlatButton("Install DX12/Shaders", StyleManager.tool_button_color);
     shaderButton.setPreferredSize(new Dimension(250, StyleManager.SELECTOR_HEIGHT - 10));
@@ -58,6 +61,35 @@ public final class ToolsPanel extends JPanel {
       }
     });
     add(shaderButton, c);
+
+    c.gridy += 1;
+
+    if(updateCheckButton == null) updateCheckButton = new RoundedFlatButton("Check for updates", StyleManager.tool_button_color);
+    updateCheckButton.setPreferredSize(new Dimension(250, StyleManager.SELECTOR_HEIGHT - 10));
+    updateCheckButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
+    updateCheckButton.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseEntered(MouseEvent e) {
+        updateCheckButton.setBackground(StyleManager.tool_button_hover_color);
+      }
+
+      @Override
+      public void mouseExited(MouseEvent e) {
+        updateCheckButton.setBackground(StyleManager.tool_button_color);
+      }
+    });
+    updateCheckButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        Main.checkForUpdates();
+      }
+    });
+    add(updateCheckButton, c);
+
+    c.gridy += 1;
+    c.weighty = 1;
+    c.fill = GridBagConstraints.BOTH;
+    add(new JLabel(), c);
 
     setVisible(false);
   }

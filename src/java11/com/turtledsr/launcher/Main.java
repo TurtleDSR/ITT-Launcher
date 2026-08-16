@@ -68,9 +68,6 @@ public final class Main {
   public static Thread serverThread;
   public static ServerSocket serverSocket;
   public static ExecutorService socketThreadPool;
-
-  public static Thread updateThread;
-  public static UpdateChecker updateChecker;
   
   public static void main(String[] args) throws Exception {
     MainPanel.createLogPanel(); //initialize log panel first so we can log things
@@ -135,9 +132,7 @@ public final class Main {
     LogPanel.updateStyle();
 
     if(SettingsManager.settings.developerSettings.checkForUpdates) { //check for updates
-      updateThread = new Thread(() -> startUpdateThread());
-      updateThread.setDaemon(true);
-      updateThread.start();
+      checkForUpdates();
     }
 
     while(true) {
@@ -205,6 +200,12 @@ public final class Main {
     createTrayMenu();
   }
 
+  public static void checkForUpdates() {
+    Thread updateThread = new Thread(() -> startUpdateThread());
+    updateThread.setDaemon(true);
+    updateThread.start();
+  }
+
   public static InputStream getResourceAsStream(String path) {
     return Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
   }
@@ -265,7 +266,7 @@ public final class Main {
 
   private static void startUpdateThread() {
     try{
-      updateChecker = new UpdateChecker("TurtleDSR", "ITT-Launcher", VERSION);
+      UpdateChecker updateChecker = new UpdateChecker("TurtleDSR", "ITT-Launcher", VERSION);
       updateChecker.check();
 
       if(updateChecker.isUpdateAvailable()) {
