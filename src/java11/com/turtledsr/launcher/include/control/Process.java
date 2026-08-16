@@ -354,8 +354,6 @@ public final class Process {
         String extension = fullname.substring(partition + 1);
         String name = fullname.substring(0, partition);
 
-        Logs.log("Found mod: " + name, "PROCESS");
-
         if (extension.equalsIgnoreCase("zip")) {
           if (!(name.equals("Default") || name.equals("Backup") ||  name.equals("Default-Game-Backup"))) {
             directory.add(new Mod(name)); //check if zip is default scripts folder

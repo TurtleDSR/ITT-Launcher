@@ -18,6 +18,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.technicjelle.UpdateChecker;
 import com.turtledsr.launcher.include.config.SettingsManager;
 import com.turtledsr.launcher.include.control.Autosplitter;
 import com.turtledsr.launcher.include.control.Process;
@@ -36,6 +37,7 @@ import com.turtledsr.launcher.include.ui.styled.messageBox.MessageBox;
 
 public final class Main {
   public static final String TITLE = "It Takes Two Launcher";
+  public static final String VERSION = "2.0.0";
 
   public static final int RECONNECTION_INTERVAL = 500;
   public static boolean scriptCacheEnabled = Process.getScriptCacheEnabled();
@@ -58,6 +60,9 @@ public final class Main {
   public static Thread serverThread;
   public static ServerSocket serverSocket;
   public static ExecutorService socketThreadPool;
+
+  public static Thread updateThread;
+  public static UpdateChecker updateChecker;
   
   public static void main(String[] args) throws Exception {
     MainPanel.createLogPanel(); //initialize log panel first so we can log things
@@ -120,6 +125,12 @@ public final class Main {
 
     //update log panel to have correct style
     LogPanel.updateStyle();
+
+    if(SettingsManager.settings.developerSettings.checkForUpdates) { //check for updates
+      updateThread = new Thread(() -> startUpdateThread());
+      updateThread.setDaemon(true);
+      updateThread.start();
+    }
 
     while(true) {
       tick();
@@ -241,6 +252,19 @@ public final class Main {
       socketThreadPool = null;
 
       serverThreadSafe = false;
+    }
+  }
+
+  private static void startUpdateThread() {
+    try{
+      updateChecker = new UpdateChecker("TurtleDSR", "ITT-Launcher", VERSION);
+      updateChecker.check();
+
+      if(updateChecker.isUpdateAvailable()) {
+        new MessageBox("Update Available", "New update available: (" + VERSION + ") -> (" + updateChecker.getLatestVersion() + ")");
+      }
+    } catch(Exception e) {
+      Logs.logError("Failed to check for updates: " + e.getLocalizedMessage(), "UPDATE_THREAD");
     }
   }
 

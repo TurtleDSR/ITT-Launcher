@@ -10,8 +10,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.JDialog;
@@ -44,13 +42,6 @@ public class MessageBox extends JDialog {
     c.weightx = 1;
     c.weighty = 0;
 
-    addComponentListener(new ComponentAdapter() { //rounded corners
-      @Override
-      public void componentResized(ComponentEvent e) {
-        setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), Window.CORNER_ROUNDING, Window.CORNER_ROUNDING));
-      }
-    });
-
     titleBar = new TitleBar(title, this);
     add(titleBar, c);
 
@@ -74,6 +65,7 @@ public class MessageBox extends JDialog {
     setResizable(false);
     setAlwaysOnTop(true);
     setUndecorated(true);
+    setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), Window.CORNER_ROUNDING, Window.CORNER_ROUNDING));
     
     setVisible(true);
   }

@@ -9,3 +9,4 @@ Credit to the authors and contributors of the external libraries used:
   Jackson Project
   JNA
   zip4j
+  UpdateChecker by technicjelle

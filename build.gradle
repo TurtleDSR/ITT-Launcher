@@ -15,7 +15,7 @@ application {
 afterEvaluate {
   runtime {
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
-    modules = ['java.base', 'java.desktop', 'java.logging']
+    modules = ['java.base', 'java.desktop', 'java.logging', 'java.net.http', 'jdk.crypto.ec', 'jdk.crypto.mscapi']
   }
 }
 
@@ -80,7 +80,7 @@ tasks.register('buildRuntime', Exec) {
     .metadata.installationPath.file("bin/jlink").asFile.absolutePath
   commandLine jlinkPath, 
     '--module-path', "${javaToolchains.compilerFor(java.toolchain).get().metadata.installationPath.asFile}/jmods",
-    '--add-modules', 'java.base,java.desktop,java.logging',
+    '--add-modules', 'java.base,java.desktop,java.logging,java.net.http,jdk.crypto.ec,jdk.crypto.mscapi',
     '--strip-debug', 
     '--compress', '2', 
     '--no-header-files', 
