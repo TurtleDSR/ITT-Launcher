@@ -4,12 +4,18 @@ Entry point for the ITT Ranked client
 
 package com.turtledsr.launcher;
 
+import java.awt.Dimension;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
+import java.awt.Toolkit;
 import java.awt.TrayIcon;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,9 +36,11 @@ import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.ImageManager;
+import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.launcher.Window;
 import com.turtledsr.launcher.include.ui.launcher.debug.LogPanel;
 import com.turtledsr.launcher.include.ui.launcher.rootPanels.MainPanel;
+import com.turtledsr.launcher.include.ui.styled.button.RoundedFlatButton;
 import com.turtledsr.launcher.include.ui.styled.messageBox.MessageBox;
 
 public final class Main {
@@ -261,7 +269,37 @@ public final class Main {
       updateChecker.check();
 
       if(updateChecker.isUpdateAvailable()) {
-        new MessageBox("Update Available", "New update available: (" + VERSION + ") -> (" + updateChecker.getLatestVersion() + ")");
+        String message = "" +
+          "New update available: (" + VERSION + ") -> (" + updateChecker.getLatestVersion() + ")" +
+          "\n" +
+          "\n" +
+          "Download it at: " + updateChecker.getUpdateUrl()
+        ;
+
+        RoundedFlatButton linkButton = new RoundedFlatButton("Copy Link", StyleManager.launch_button_color);
+        linkButton.setPreferredSize(new Dimension(80, 25));
+        linkButton.addMouseListener(new MouseAdapter() {
+          @Override
+          public void mouseEntered(MouseEvent e) {
+            linkButton.setBackground(StyleManager.launch_button_hover_color);
+          }
+          @Override
+          public void mouseExited(MouseEvent e) {
+            linkButton.setBackground(StyleManager.launch_button_color);
+          }
+        });
+        linkButton.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            StringSelection stringSelection = new StringSelection(updateChecker.getUpdateUrl());
+            clipboard.setContents(stringSelection, null);
+
+            linkButton.setText("Link Copied!");
+          }
+        });
+        
+        new MessageBox("Update Available", message, linkButton);
       }
     } catch(Exception e) {
       Logs.logError("Failed to check for updates: " + e.getLocalizedMessage(), "UPDATE_THREAD");

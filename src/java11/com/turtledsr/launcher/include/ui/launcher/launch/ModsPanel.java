@@ -1,5 +1,5 @@
 /*
-Panel used to select mods to launch
+Main panel for the game/livesplit launcher
 */
 
 package com.turtledsr.launcher.include.ui.launcher.launch;
@@ -7,94 +7,49 @@ package com.turtledsr.launcher.include.ui.launcher.launch;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.util.ArrayList;
+import java.awt.Insets;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import com.turtledsr.launcher.include.control.Process;
-import com.turtledsr.launcher.include.engine.Logs;
-import com.turtledsr.launcher.include.struct.Mod;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 
-public final class ModsPanel extends JPanel implements MouseWheelListener {
-  public static final int MODCOUNT = 10;
-
-  public static ArrayList<Mod> mods;
-  public static ModButton[] modButtons = new ModButton[MODCOUNT];
-
-  public static int startingModIndex = 0; //starting point for the mod list
+public final class ModsPanel extends JPanel {
+  public static ModsToolbar launchButtonPanel;
+  public static ModsListPanel modsPanel;
 
   public ModsPanel() {
     super(new GridBagLayout());
 
-    if(mods == null) mods = Process.getModList();
-
-    setPreferredSize(new Dimension(StyleManager.PANEL_SIZE.width, StyleManager.PANEL_SIZE.height - StyleManager.LAUNCH_PANEL_HEIGHT - 7));
+    setPreferredSize(StyleManager.PANEL_SIZE);
     setBackground(StyleManager.background_color);
 
+    if(launchButtonPanel == null) launchButtonPanel = new ModsToolbar();
+    if(modsPanel == null) modsPanel = new ModsListPanel();
+
     GridBagConstraints c = new GridBagConstraints();
-    c.anchor = GridBagConstraints.NORTH;
-    c.fill = GridBagConstraints.NONE;
-    c.weightx = 1;
-    c.weighty = 0;
+    c.anchor = GridBagConstraints.NORTHWEST;
+    c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
     c.gridy = 0;
+    c.weightx = 1;
+    c.weighty = 0;
 
-    for (int i = 0; i < MODCOUNT; i++) {
-      if(mods != null && i < mods.size()) {
-        modButtons[i] = new ModButton(mods.get(i));
-      } else {
-        modButtons[i] = new ModButton(null);
-      }
+    add(launchButtonPanel, c);
 
-      add(modButtons[i], c);
-      c.gridy++;
-    }
+    c.anchor = GridBagConstraints.SOUTH;
+    c.insets = new Insets(0, 10, 5, 10);
+    c.gridy += 1;
 
-    c.weighty = 1;
-    add(new JLabel(), c); //weigh the buttons down
+    JPanel sep = new JPanel();
+    sep.setPreferredSize(new Dimension(1, 2));
+    sep.setBackground(StyleManager.separator_color);
+    add(sep, c);
 
-    addMouseWheelListener(this);
+    c.anchor = GridBagConstraints.NORTHWEST;
+    c.gridy += 1;
+    c.insets = new Insets(0, 0, 0, 0);
+    add(modsPanel, c);
 
-    setOpaque(true);
-  }
-
-  public static void updateModList() {
-    for (int i = 0; i < MODCOUNT; i++) {
-      if(mods != null && i < mods.size()) {
-        if(modButtons[i] == null) {
-          modButtons[i] = new ModButton(mods.get(i + startingModIndex));
-        } else {
-          modButtons[i].mod = mods.get(i + startingModIndex);
-        }
-        modButtons[i].update();
-      } else {
-        modButtons[i].mod = null;
-        modButtons[i].update();
-      }
-    }
-  }
-
-  public static void refreshMods() {
-    startingModIndex = 0;
-    mods = Process.getModList();
-
-    updateModList();
-  }
-
-  @Override
-  public void mouseWheelMoved(MouseWheelEvent e) {
-    if(mods.size() > 10) {
-      startingModIndex += e.getWheelRotation();
-
-      if(startingModIndex < 0) startingModIndex = 0;
-      if(startingModIndex + 9 >= mods.size()) startingModIndex = mods.size() - 10;
-
-      updateModList();
-      Logs.log("MOUSE MOVED");
-    }
+    setVisible(false);
   }
 }

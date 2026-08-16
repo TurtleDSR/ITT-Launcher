@@ -1,6 +1,10 @@
-package com.turtledsr.launcher.include.ui.launcher.launch;
+/*
+Toggle button used on each mod index
+*/
+package com.turtledsr.launcher.include.ui.launcher.launch.modIndex;
 
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
+import com.turtledsr.launcher.include.ui.launcher.launch.ToggleModsButton;
 import com.turtledsr.launcher.include.ui.styled.button.ToggleButton;
 
 public final class ModToggleButton extends ToggleButton {

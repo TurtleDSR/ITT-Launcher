@@ -1,3 +1,7 @@
+/*
+Toolbar for the Mods panel
+*/
+
 package com.turtledsr.launcher.include.ui.launcher.launch;
 
 import java.awt.Desktop;
@@ -19,14 +23,14 @@ import com.turtledsr.launcher.include.engine.Logs;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.styled.button.RoundedFlatButton;
 
-public final class LaunchButtonPanel extends JPanel {
+public final class ModsToolbar extends JPanel {
   public static RoundedFlatButton launchRankedButton;
   public static ToggleModsButton toggleModsButton;
 
   public static RoundedFlatButton modsFolderButton;
   public static RoundedFlatButton refreshModsButton;
 
-  public LaunchButtonPanel() {
+  public ModsToolbar() {
     super(new GridBagLayout());
     setPreferredSize(new Dimension(StyleManager.PANEL_SIZE.width, StyleManager.LAUNCH_PANEL_HEIGHT));
     setBackground(StyleManager.background_color);
@@ -73,7 +77,7 @@ public final class LaunchButtonPanel extends JPanel {
     refreshModsButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        ModsPanel.refreshMods();
+        ModsListPanel.refreshMods();
       }
     });
 

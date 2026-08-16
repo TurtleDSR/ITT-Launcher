@@ -9,7 +9,7 @@ package com.turtledsr.launcher.include.ui.launcher.rootPanels;
 import com.turtledsr.launcher.include.config.SettingsManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.launcher.debug.LogPanel;
-import com.turtledsr.launcher.include.ui.launcher.launch.LauncherPanel;
+import com.turtledsr.launcher.include.ui.launcher.launch.ModsPanel;
 import com.turtledsr.launcher.include.ui.launcher.panelSelector.PanelSelector;
 import com.turtledsr.launcher.include.ui.launcher.ranked.RankedPanel;
 import com.turtledsr.launcher.include.ui.launcher.tools.ToolsPanel;
@@ -26,7 +26,7 @@ public final class MainPanel extends AbstractRootPanel {
 
   public static PanelSelector panelSelector;
 
-  public static LauncherPanel launcherPanel;
+  public static ModsPanel launcherPanel;
   public static RankedPanel rankedPanel;
   public static ToolsPanel toolsPanel;
   public static LogPanel logPanel;
@@ -53,7 +53,7 @@ public final class MainPanel extends AbstractRootPanel {
 
     if(panelSelector == null) panelSelector = new PanelSelector();
 
-    if(launcherPanel == null) launcherPanel = new LauncherPanel();
+    if(launcherPanel == null) launcherPanel = new ModsPanel();
     if(rankedPanel == null) rankedPanel = new RankedPanel();
     if(toolsPanel == null) toolsPanel = new ToolsPanel();
     if(logPanel == null) logPanel = new LogPanel();

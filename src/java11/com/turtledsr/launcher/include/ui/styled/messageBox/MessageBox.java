@@ -18,17 +18,23 @@ import javax.swing.JTextArea;
 import com.turtledsr.launcher.Main;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.launcher.Window;
+import com.turtledsr.launcher.include.ui.styled.button.FlatButton;
 import com.turtledsr.launcher.include.ui.styled.messageBox.titleBar.TitleBar;
 
 public class MessageBox extends JDialog {
   public TitleBar titleBar;
   public JTextArea messagePanel;
+  public FlatButton button;
 
   public MessageBox(String message) {
-    this("", message);
+    this("", message, null);
   }
 
   public MessageBox(String title, String message) {
+    this(title, message, null);
+  }
+
+  public MessageBox(String title, String message, FlatButton button) {
     super();
 
     setLayout(new GridBagLayout());
@@ -44,12 +50,14 @@ public class MessageBox extends JDialog {
 
     titleBar = new TitleBar(title, this);
     add(titleBar, c);
-
-    c.insets = new Insets(1, 4, 1, 3);
-    c.anchor = GridBagConstraints.SOUTH;
-    c.fill = GridBagConstraints.BOTH;
     c.gridy += 1;
-    c.weighty = 1;
+
+    c.insets = new Insets(1, 4, 1, 4);
+    c.fill = GridBagConstraints.BOTH; 
+    if(button == null) {
+      c.anchor = GridBagConstraints.SOUTH;
+      c.weighty = 1;
+    }
 
     messagePanel = new JTextArea(message);
     messagePanel.setEditable(false);
@@ -57,6 +65,17 @@ public class MessageBox extends JDialog {
     messagePanel.setForeground(StyleManager.foreground_color);
     messagePanel.setBackground(StyleManager.background_hover_color);
     add(messagePanel, c);
+
+    c.gridy += 1;
+
+    if(button != null) {
+      c.weighty = 1;
+      c.insets = new Insets(5, 0, 12, 0);
+      c.anchor = GridBagConstraints.SOUTH;
+      c.fill = GridBagConstraints.NONE;
+    }
+
+    add(button, c);
 
     setSize(StyleManager.MESSAGE_BOX_SIZE);  
     setLocation((Main.window.getLocation().x + (Main.window.getWidth() / 2)) - (getWidth() / 2), (Main.window.getLocation().y + (Main.window.getHeight() / 2) - (getHeight() / 2)));

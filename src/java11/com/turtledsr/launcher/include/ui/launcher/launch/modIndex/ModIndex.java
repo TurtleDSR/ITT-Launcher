@@ -2,7 +2,7 @@
 The panel that shows the mod name and a toggle switch 
 */
 
-package com.turtledsr.launcher.include.ui.launcher.launch;
+package com.turtledsr.launcher.include.ui.launcher.launch.modIndex;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -23,9 +23,10 @@ import com.turtledsr.launcher.include.control.Process;
 import com.turtledsr.launcher.include.struct.Mod;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
+import com.turtledsr.launcher.include.ui.launcher.launch.ModsListPanel;
 import com.turtledsr.launcher.include.ui.styled.panel.RoundedPanel;
 
-public final class ModButton extends RoundedPanel implements ActionListener {
+public final class ModIndex extends RoundedPanel implements ActionListener {
   public Mod mod;
 
   private final static int CORNER_ROUNDING = 12;
@@ -33,11 +34,11 @@ public final class ModButton extends RoundedPanel implements ActionListener {
   private JLabel modLabel;
   private ModToggleButton toggle;
 
-  public ModButton(Mod mod) {
+  public ModIndex(Mod mod) {
     super(new GridBagLayout(), CORNER_ROUNDING);
 
     setPreferredSize(new Dimension(StyleManager.PANEL_SIZE.width - 15,
-        (StyleManager.PANEL_SIZE.height - StyleManager.LAUNCH_PANEL_HEIGHT - 7) / ModsPanel.MODCOUNT));
+        (StyleManager.PANEL_SIZE.height - StyleManager.LAUNCH_PANEL_HEIGHT - 7) / ModsListPanel.MODCOUNT));
     setBackground(StyleManager.background_color);
 
     GridBagConstraints c = new GridBagConstraints();
@@ -122,15 +123,15 @@ public final class ModButton extends RoundedPanel implements ActionListener {
   @Override
   public void actionPerformed(ActionEvent e) {
     mod.toggled = toggle.toggled;
-    Process.updateModListCache(ModsPanel.mods);
+    Process.updateModListCache(ModsListPanel.mods);
   }
 }
 
 class DragAdapter extends MouseAdapter {
-  ModButton parent;
+  ModIndex parent;
   private int activeSlotIndex = -1;
 
-  public DragAdapter(ModButton button) {
+  public DragAdapter(ModIndex button) {
     this.parent = button;
   }
 
@@ -138,8 +139,8 @@ class DragAdapter extends MouseAdapter {
   public void mousePressed(MouseEvent e) {
     if(parent.mod == null) return;
 
-    for (int i = 0; i < ModsPanel.MODCOUNT; i++) {
-      if (ModsPanel.modButtons[i] == parent) {
+    for (int i = 0; i < ModsListPanel.MODCOUNT; i++) {
+      if (ModsListPanel.modButtons[i] == parent) {
         activeSlotIndex = i;
         break;
       }
@@ -159,20 +160,20 @@ class DragAdapter extends MouseAdapter {
     if (targetSlot < 0) {
       targetSlot = 0;
     }
-    if (targetSlot >= ModsPanel.MODCOUNT) {
-      targetSlot = ModsPanel.MODCOUNT - 1;
+    if (targetSlot >= ModsListPanel.MODCOUNT) {
+      targetSlot = ModsListPanel.MODCOUNT - 1;
     }
 
-    int currentActualIndex = activeSlotIndex + ModsPanel.startingModIndex;
-    int targetActualIndex = targetSlot + ModsPanel.startingModIndex;
+    int currentActualIndex = activeSlotIndex + ModsListPanel.startingModIndex;
+    int targetActualIndex = targetSlot + ModsListPanel.startingModIndex;
 
-    if (targetSlot != activeSlotIndex && targetActualIndex < ModsPanel.mods.size() && targetActualIndex >= 0) {
-      Mod movingMod = ModsPanel.mods.remove(currentActualIndex);
-      ModsPanel.mods.add(targetActualIndex, movingMod);
+    if (targetSlot != activeSlotIndex && targetActualIndex < ModsListPanel.mods.size() && targetActualIndex >= 0) {
+      Mod movingMod = ModsListPanel.mods.remove(currentActualIndex);
+      ModsListPanel.mods.add(targetActualIndex, movingMod);
 
       activeSlotIndex = targetSlot;
-      ModsPanel.updateModList();
-      Process.updateModListCache(ModsPanel.mods);
+      ModsListPanel.updateModList();
+      Process.updateModListCache(ModsListPanel.mods);
 
       parent.getParent().revalidate();
       parent.getParent().repaint();

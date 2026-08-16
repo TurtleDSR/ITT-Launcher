@@ -43,7 +43,7 @@ import com.turtledsr.launcher.include.engine.ZipManager;
 import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.struct.ITTASKeybinds;
 import com.turtledsr.launcher.include.struct.Mod;
-import com.turtledsr.launcher.include.ui.launcher.launch.ModsPanel;
+import com.turtledsr.launcher.include.ui.launcher.launch.ModsListPanel;
 import com.turtledsr.launcher.include.ui.launcher.launch.ToggleModsButton;
 
 public final class Process {
@@ -95,8 +95,8 @@ public final class Process {
     boolean mods = false;
 
     if(ToggleModsButton.toggled) {
-      for (int i = ModsPanel.mods.size() - 1; i >= 0; i--) { //top mod gets final priority
-        if (ModsPanel.mods.get(i).toggled) {
+      for (int i = ModsListPanel.mods.size() - 1; i >= 0; i--) { //top mod gets final priority
+        if (ModsListPanel.mods.get(i).toggled) {
           mods = true;
           break;
         }
@@ -122,10 +122,10 @@ public final class Process {
           disableScriptCache();
 
           //install mods
-          for (int i = ModsPanel.mods.size() - 1; i >= 0; i--) { //top mod gets final priority
-            if (ModsPanel.mods.get(i).toggled) {
-              Logs.log("Installing mod: " + ModsPanel.mods.get(i).name, "PROCESS");
-              installMod(getGameDirectory() + "Mods/" + ModsPanel.mods.get(i).name + ".zip");
+          for (int i = ModsListPanel.mods.size() - 1; i >= 0; i--) { //top mod gets final priority
+            if (ModsListPanel.mods.get(i).toggled) {
+              Logs.log("Installing mod: " + ModsListPanel.mods.get(i).name, "PROCESS");
+              installMod(getGameDirectory() + "Mods/" + ModsListPanel.mods.get(i).name + ".zip");
             }
           }
 

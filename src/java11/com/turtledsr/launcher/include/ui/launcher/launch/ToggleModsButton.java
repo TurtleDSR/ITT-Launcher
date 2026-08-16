@@ -1,6 +1,7 @@
 /*
 Button for toggling mods on and off
 */
+
 package com.turtledsr.launcher.include.ui.launcher.launch;
 
 import java.awt.event.ActionEvent;
@@ -42,7 +43,7 @@ public final class ToggleModsButton extends RoundedFlatButton implements ActionL
     SettingsManager.writeSettings();
 
     update();
-    ModsPanel.updateModList();
+    ModsListPanel.updateModList();
   }
 
   @Override
