@@ -73,9 +73,9 @@ public class MessageBox extends JDialog {
       c.insets = new Insets(5, 0, 12, 0);
       c.anchor = GridBagConstraints.SOUTH;
       c.fill = GridBagConstraints.NONE;
-    }
 
-    add(button, c);
+      add(button, c);
+    }
 
     setSize(StyleManager.MESSAGE_BOX_SIZE);  
     setLocation((Main.window.getLocation().x + (Main.window.getWidth() / 2)) - (getWidth() / 2), (Main.window.getLocation().y + (Main.window.getHeight() / 2) - (getHeight() / 2)));
