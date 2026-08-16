@@ -13,6 +13,7 @@ import java.awt.Insets;
 import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import com.turtledsr.launcher.Main;
@@ -24,18 +25,23 @@ import com.turtledsr.launcher.include.ui.styled.messageBox.titleBar.TitleBar;
 public class MessageBox extends JDialog {
   public TitleBar titleBar;
   public JTextArea messagePanel;
-  public FlatButton button;
+  public FlatButton[] buttonArray;
 
   public MessageBox(String message) {
-    this("", message, null);
+    this("", message, new FlatButton[0]);
   }
 
   public MessageBox(String title, String message) {
-    this(title, message, null);
+    this(title, message, new FlatButton[0]);
   }
 
-  public MessageBox(String title, String message, FlatButton button) {
+  public MessageBox(String title, String message, FlatButton... buttons) {
     super();
+    if(buttons == null) {
+      buttonArray = new FlatButton[0];
+    } else {
+      buttonArray = buttons;
+    }
 
     setLayout(new GridBagLayout());
 
@@ -54,7 +60,7 @@ public class MessageBox extends JDialog {
 
     c.insets = new Insets(1, 4, 1, 4);
     c.fill = GridBagConstraints.BOTH; 
-    if(button == null) {
+    if(buttonArray.length == 0) {
       c.anchor = GridBagConstraints.SOUTH;
       c.weighty = 1;
     }
@@ -68,13 +74,29 @@ public class MessageBox extends JDialog {
 
     c.gridy += 1;
 
-    if(button != null) {
+    if(buttonArray.length != 0) {
       c.weighty = 1;
       c.insets = new Insets(5, 0, 12, 0);
       c.anchor = GridBagConstraints.SOUTH;
-      c.fill = GridBagConstraints.NONE;
+      c.fill = GridBagConstraints.HORIZONTAL;
 
-      add(button, c);
+      JPanel buttonPanel = new JPanel(new GridBagLayout());
+      buttonPanel.setBackground(StyleManager.background_hover_color);
+      GridBagConstraints cc = new GridBagConstraints();
+      cc.anchor = GridBagConstraints.CENTER;
+      cc.fill = GridBagConstraints.NONE;
+      cc.insets = new Insets(0, 0, 0, 0);
+      cc.gridx = 0;
+      cc.gridy = 0;
+      cc.weightx = 1;
+      cc.weighty = 1;
+
+      for (FlatButton button : buttonArray) {
+        buttonPanel.add(button, cc);
+        cc.gridx += 1;
+      }
+
+      add(buttonPanel, c);
     }
 
     setSize(StyleManager.MESSAGE_BOX_SIZE);  

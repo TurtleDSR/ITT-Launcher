@@ -33,11 +33,11 @@ build-J:
 [windows]
 build-C:
   @#create icon image for the exe
-  @just update-ico &
+  @just update-ico
 
   @#create missing directories
-  @[ -d build/c ] || mkdir -p build/c &
-  @[ -d build/tmp/c ] || mkdir -p build/tmp/c &
+  @[ -d build/c ] || mkdir -p build/c
+  @[ -d build/tmp/c ] || mkdir -p build/tmp/c
 
   @#compile resources
   llvm-rc src/launch/launch.rc -fo build/tmp/c/launch.res

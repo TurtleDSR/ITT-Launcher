@@ -132,7 +132,7 @@ public final class Main {
     LogPanel.updateStyle();
 
     if(SettingsManager.settings.developerSettings.checkForUpdates) { //check for updates
-      checkForUpdates();
+      checkForUpdates(false);
     }
 
     while(true) {
@@ -201,7 +201,11 @@ public final class Main {
   }
 
   public static void checkForUpdates() {
-    Thread updateThread = new Thread(() -> startUpdateThread());
+    checkForUpdates(true);
+  }
+
+  public static void checkForUpdates(boolean sendMessageIfNoUpdate) {
+    Thread updateThread = new Thread(() -> startUpdateThread(sendMessageIfNoUpdate));
     updateThread.setDaemon(true);
     updateThread.start();
   }
@@ -264,10 +268,9 @@ public final class Main {
     }
   }
 
-  private static void startUpdateThread() {
+  private static void startUpdateThread(boolean sendMessageIfNoUpdate) {
     try{
       UpdateChecker updateChecker = new UpdateChecker("TurtleDSR", "ITT-Launcher", VERSION);
-      updateChecker.check();
 
       if(updateChecker.isUpdateAvailable()) {
         String message = "" +
@@ -301,6 +304,8 @@ public final class Main {
         });
         
         new MessageBox("Update Available", message, linkButton);
+      } else if(sendMessageIfNoUpdate) {
+        new MessageBox("No Update Available", "Latest version installed: (" + VERSION + ")");
       }
     } catch(Exception e) {
       Logs.logError("Failed to check for updates: " + e.getLocalizedMessage(), "UPDATE_THREAD");
