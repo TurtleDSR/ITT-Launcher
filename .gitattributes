@@ -1,2 +1,3 @@
 #library c files
 src/update/include/* linguist-vendored
+src/update/zip.c linguist-vendored
