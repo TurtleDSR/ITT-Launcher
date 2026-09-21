@@ -30,8 +30,8 @@ sourceSets {
 }
 
 dependencies {
-  implementation fileTree(dir: 'lib', include: ['*.jar'])
-  java11Implementation fileTree(dir: 'lib', include: ['*.jar'])
+  implementation fileTree(dir: 'lib/jar', include: ['*.jar'])
+  java11Implementation fileTree(dir: 'lib/jar', include: ['*.jar'])
 }
 
 tasks.named('compileJava') {
@@ -43,7 +43,7 @@ tasks.named('compileJava11Java') {
 }
 
 tasks.named('processJava11Resources') {
-  filesMatching(['**/*.ttf', '**/*.otf', '**/*.zip']) {
+  filesMatching(['**/*.ttf', '**/*.otf', '**/*.zip', '**/*.dll', '**/*.ini', '**/*.addon64']) {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
   }
 }

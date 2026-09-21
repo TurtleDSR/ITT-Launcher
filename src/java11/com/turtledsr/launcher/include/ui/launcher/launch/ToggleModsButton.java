@@ -43,7 +43,7 @@ public final class ToggleModsButton extends RoundedFlatButton implements ActionL
     SettingsManager.writeSettings();
 
     update();
-    ModsListPanel.updateModList();
+    ModsListPanel.refreshMods();
   }
 
   @Override

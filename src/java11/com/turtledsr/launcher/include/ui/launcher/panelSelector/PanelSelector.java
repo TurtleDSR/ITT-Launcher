@@ -19,15 +19,18 @@ import javax.swing.JPanel;
 import com.turtledsr.launcher.Main;
 import com.turtledsr.launcher.include.config.SettingsManager;
 import com.turtledsr.launcher.include.control.Process;
+import com.turtledsr.launcher.include.engine.Logs;
 import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
+import com.turtledsr.launcher.include.ui.launcher.configs.ConfigListPanel;
 import com.turtledsr.launcher.include.ui.launcher.rootPanels.MainPanel;
 import com.turtledsr.launcher.include.ui.styled.button.RoundedFlatButton;
 
 public final class PanelSelector extends JPanel {
   private static PanelSelectorButton launcherButton;
   private static PanelSelectorButton rankedButton;
+  private static PanelSelectorButton configButton;
   private static PanelSelectorButton toolsButton;
   private static PanelSelectorButton logButton;
   private static RoundedFlatButton launchGameButton;
@@ -55,6 +58,10 @@ public final class PanelSelector extends JPanel {
     //if(rankedButton == null) rankedButton = new PanelSelectorButton("Ranked", MainPanel.RANKED);
     //add(rankedButton, c);
     //c.gridx += 1;
+
+    if(configButton == null) configButton = new PanelSelectorButton("Configs", MainPanel.CONFIGS);
+    add(configButton, c);
+    c.gridx += 1;
 
     if(toolsButton == null) toolsButton = new PanelSelectorButton("Tools", MainPanel.TOOLS);
     add(toolsButton, c);
@@ -121,18 +128,42 @@ public final class PanelSelector extends JPanel {
       }
     }, "game_disconnected");
 
+    EventManager.addListener(new EventListener() {
+      @Override
+      public void eventTriggered() {
+        PanelSelector.launchGameButton.setText("Launch");
+      }
+    }, "mod_inject_failure");
+
+    EventManager.addListener(new EventListener() {
+      @Override
+      public void eventTriggered() {
+        PanelSelector.launchGameButton.setText("Launch");
+      }
+    }, "game_launch_failure");
+
+
     //developer tabs
     if(!SettingsManager.settings.developerSettings.devMode) {
       if(logButton != null) logButton.setVisible(false);
-      if(rankedButton != null) rankedButton.setVisible(false);
     }
     EventManager.addListener(new EventListener() {
       @Override
       public void eventTriggered() {
         if(logButton != null) logButton.setVisible(SettingsManager.settings.developerSettings.devMode);
-        if(rankedButton != null) rankedButton.setVisible(SettingsManager.settings.developerSettings.devMode);
       }
     }, "DevMode_Toggled");
+
+    //Game config update
+    if(configButton != null) configButton.setVisible(Process.getGameConfigs().size() > 0);
+
+    EventManager.addListener(new EventListener() {
+      @Override
+      public void eventTriggered() {
+        if(configButton != null) configButton.setVisible(Process.getGameConfigs().size() > 0);
+        MainPanel.configsPanel.update();
+      }
+    }, "Config_Folder_Update");
     
     add(launchGameButton, c);
   }
@@ -140,6 +171,7 @@ public final class PanelSelector extends JPanel {
   public void updateButtons() {
     if(launcherButton != null) launcherButton.update();
     if(rankedButton != null) rankedButton.update();
+    if(configButton != null) configButton.update();
     if(toolsButton != null) toolsButton.update();
     if(logButton != null) logButton.update();
   }

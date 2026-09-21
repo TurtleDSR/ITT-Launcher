@@ -6,15 +6,24 @@ package com.turtledsr.launcher.include.struct;
 public final class Mod {
   public String name;
   public boolean toggled;
+  public Format format;
 
-  public Mod(String name, boolean toggled) {
+  public Mod(String name, boolean toggled, Format format) {
     this.name = name;
     this.toggled = toggled;
+    this.format = format;
+  }
+
+  public Mod(String name, boolean toggled) {
+    this(name, toggled, Format.asmod);
   }
 
   public Mod(String name) {
-    this.name = name;
-    this.toggled = false;
+    this(name, false, Format.asmod);
+  }
+
+  public Mod() {
+    //unimplemented
   }
 
   @Override
@@ -26,5 +35,10 @@ public final class Mod {
   @Override
   public String toString() {
     return name;
+  }
+
+  public enum Format {
+    asmod,
+    zip
   }
 }

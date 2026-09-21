@@ -8,10 +8,7 @@ import java.awt.Dimension;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
-import java.awt.Toolkit;
 import java.awt.TrayIcon;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -21,8 +18,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.FileSystems;
+import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.technicjelle.UpdateChecker;
 import com.turtledsr.launcher.include.config.SettingsManager;
@@ -30,7 +34,6 @@ import com.turtledsr.launcher.include.control.Autosplitter;
 import com.turtledsr.launcher.include.control.Process;
 import com.turtledsr.launcher.include.control.TimerHandler;
 import com.turtledsr.launcher.include.engine.Logs;
-import com.turtledsr.launcher.include.engine.ShaderManager;
 import com.turtledsr.launcher.include.engine.SingleInstanceManager;
 import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
@@ -50,6 +53,7 @@ public final class Main {
   public static final int RECONNECTION_INTERVAL = 500;
   public static boolean scriptCacheEnabled = Process.getScriptCacheEnabled();
   public static boolean lockQueue = false;
+  public static AtomicBoolean updating = new AtomicBoolean(false);
   
   public static boolean timerConnected = false;
   public static boolean gameConnected = false;
@@ -68,9 +72,23 @@ public final class Main {
   public static Thread serverThread;
   public static ServerSocket serverSocket;
   public static ExecutorService socketThreadPool;
+
+  public static String[] args;
+
+  private static WatchService modWatcher;
+  private static WatchService gameConfigWatcher;
   
   public static void main(String[] args) throws Exception {
     MainPanel.createLogPanel(); //initialize log panel first so we can log things
+
+    String allArgs = "";
+    for (String arg : args) {
+      allArgs += arg + " ";
+    }
+
+    Main.args = args;
+
+    Logs.log(String.format("Arguments (%s): %s", args.length, allArgs), "MAIN");
 
     if(SingleInstanceManager.checkIfAlreadyRunning()) { //check if program is already running
       SettingsManager.loadSettings(false); //dont hook settings to update on close
@@ -90,7 +108,6 @@ public final class Main {
 
     ImageManager.loadImages();
     FontManager.loadFonts();
-    ShaderManager.extractShaders();
     //LivesplitManager.extractTimer();
 
     EventManager.addListener(new EventListener() {
@@ -118,21 +135,96 @@ public final class Main {
       @Override
       public void eventTriggered() {
         Process.gameStatus = Process.STOPPED;
+        Process.cleanScriptsAsync();
       }
     }, "game_disconnected");
 
+    EventManager.addListener(new EventListener() {
+      @Override
+      public void eventTriggered() {
+        new MessageBox("Mod Injection Failure", "One or more mods failed to install!");
+        Process.gameStatus = Process.STOPPED;
+        Process.cleanScriptsAsync();
+      }
+    }, "mod_inject_failure");
+
+    EventManager.addListener(new EventListener() {
+      @Override
+      public void eventTriggered() {
+        new MessageBox("Game Launch Failure", "Game failed to launch!");
+        Process.gameStatus = Process.STOPPED;
+        Process.cleanScriptsAsync();
+      }
+    }, "game_launch_failure");
+
     window = new Window();
+    LogPanel.updateStyle();
 
     addToTray();
 
     TimerHandler.connect();
     Autosplitter.bind();
 
-    //update log panel to have correct style
-    LogPanel.updateStyle();
-
     if(SettingsManager.settings.developerSettings.checkForUpdates) { //check for updates
       checkForUpdates(false);
+    }
+
+    if(Process.zipFormatPresent && !argumentPresent("-suppress_messages")) new MessageBox(
+      "Zip format mods found",
+      "All mods with a <span style=\"color: 'red';\">*</span> are outdated and use the zip format. " +
+      "Either update to the newest version of the mod or ask the developer to make a .asmod port."
+    );
+
+    if(argumentPresent("-update") && !argumentPresent("-suppress_messages")) {
+      new MessageBox(
+        "Update installed",
+        "The newest update has now been installed.\nThank you for supporting ITT-Launcher!"
+      );
+    }
+
+    Process.cleanScriptsAsync();
+
+    Process.getGameConfigs();
+
+    try {
+      modWatcher = FileSystems.getDefault().newWatchService();
+      Paths.get(Process.getGameDirectory() + "Mods/").register(modWatcher,
+        StandardWatchEventKinds.ENTRY_CREATE, 
+        StandardWatchEventKinds.ENTRY_DELETE
+      );
+      Thread modWatchThread = new Thread(() -> {
+        try {
+          while(true) {
+            WatchKey key = modWatcher.take();
+            key.pollEvents();
+            EventManager.triggerEvent("Mod_Folder_Update");
+            key.reset();
+          }
+        } catch(Exception e) {Logs.logError("Failure to watch for Mods folder change: " + e.getLocalizedMessage(), "MOD_WATCH_THREAD");}
+      });
+      modWatchThread.setDaemon(true);
+      modWatchThread.start();
+
+      gameConfigWatcher = FileSystems.getDefault().newWatchService();
+      Paths.get(Process.getGameConfigDirectory()).register(gameConfigWatcher, 
+        StandardWatchEventKinds.ENTRY_CREATE, 
+        StandardWatchEventKinds.ENTRY_DELETE, 
+        StandardWatchEventKinds.ENTRY_MODIFY
+      );
+      Thread configWatchThread = new Thread(() -> {
+        try {
+          while(true) {
+            WatchKey key = gameConfigWatcher.take();
+            key.pollEvents();
+            EventManager.triggerEvent("Config_Folder_Update");
+            key.reset();
+          }
+        } catch(Exception e) {Logs.logError("Failure to watch for Game Config folder change: " + e.getLocalizedMessage(), "CONFIG_WATCH_THREAD");}
+      });
+      configWatchThread.setDaemon(true);
+      configWatchThread.start();
+    } catch(Exception e) {
+      Logs.logError("Failed to register file watchers: " + e.getLocalizedMessage(), "MAIN");
     }
 
     while(true) {
@@ -224,7 +316,7 @@ public final class Main {
         Logs.log("ServerSocket Recieved Message: " + input, "SERVER_SOCKET_THREAD");
 
         if(input.equalsIgnoreCase("show_debug_message")) {
-          new MessageBox("Debug", "Test Message!\n\nThe quick brown fox jumps over the lazy dog");
+          new MessageBox("Debug", "Test Message!<br><br>The quick brown fox jumps over the lazy dog");
         }
 
         if(input.equalsIgnoreCase("hide_window")) {
@@ -273,37 +365,63 @@ public final class Main {
       UpdateChecker updateChecker = new UpdateChecker("TurtleDSR", "ITT-Launcher", VERSION);
 
       if(updateChecker.isUpdateAvailable()) {
-        String message = "" +
-          "New update available: (" + VERSION + ") -> (" + updateChecker.getLatestVersion() + ")" +
-          "\n" +
-          "\n" +
-          "Download it at: " + updateChecker.getUpdateUrl()
-        ;
+        String message = String.format(
+          "New update available: (%s) -> (%s)" +
+          "<br>" +
+          "<br>" +
+          "Manually download it on <a href=\"%s\">Github</a> or:" +
+          "<br>" +
+          "Click below to install automatically.",
 
-        RoundedFlatButton linkButton = new RoundedFlatButton("Copy Link", StyleManager.launch_button_color);
-        linkButton.setPreferredSize(new Dimension(80, 25));
-        linkButton.addMouseListener(new MouseAdapter() {
+          VERSION, updateChecker.getLatestVersion(), updateChecker.getUpdateUrl()
+        );
+
+        RoundedFlatButton installButton = new RoundedFlatButton("Install", StyleManager.launch_button_color);
+        installButton.setPreferredSize(new Dimension(80, 25));
+        installButton.addMouseListener(new MouseAdapter() {
           @Override
           public void mouseEntered(MouseEvent e) {
-            linkButton.setBackground(StyleManager.launch_button_hover_color);
+            installButton.setBackground(StyleManager.launch_button_hover_color);
           }
           @Override
           public void mouseExited(MouseEvent e) {
-            linkButton.setBackground(StyleManager.launch_button_color);
+            installButton.setBackground(StyleManager.launch_button_color);
           }
         });
-        linkButton.addActionListener(new ActionListener() {
+        installButton.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-            StringSelection stringSelection = new StringSelection(updateChecker.getUpdateUrl());
-            clipboard.setContents(stringSelection, null);
+            String link = String.format("https://github.com/TurtleDSR/ITT-Launcher/releases/download/v%s/ITT-Launcher.zip", updateChecker.getLatestVersion());
+            String download_path = "Launcher-Update.zip";
 
-            linkButton.setText("Link Copied!");
+            installButton.setText("Downloading!");
+
+            updating.set(true);
+
+            Thread updateThread = new Thread(() -> {
+              for(int i = 0; i < 3; i++) {
+                try{
+                  Process.downloadFile(link, download_path);
+                  installButton.setText("Installing!");
+
+                  ProcessBuilder process = new ProcessBuilder("update.exe");
+                  process.start();
+                  System.exit(0);
+
+                } catch(Exception ex) {
+                  Logs.logError("Failed to fetch update files: " + ex.getLocalizedMessage(), "MAIN");
+                  installButton.setText("Failure!");
+                }
+              }
+
+              updating.set(false);
+            });
+
+            updateThread.setDaemon(true);
+            updateThread.start();
           }
         });
-        
-        new MessageBox("Update Available", message, linkButton);
+        if(!argumentPresent("-suppress_messages")) new MessageBox("Update Available", message, installButton);
       } else if(sendMessageIfNoUpdate) {
         new MessageBox("No Update Available", "Latest version installed: (" + VERSION + ")");
       }
@@ -349,5 +467,9 @@ public final class Main {
     trayMenu.add(exitButton);
 
     if(trayicon != null) trayicon.setPopupMenu(trayMenu);
+  }
+
+  public static boolean argumentPresent(String argument) {
+    return Arrays.stream(args).anyMatch(arg -> arg.equals(argument));
   }
 }

@@ -7,9 +7,14 @@ Controls all of the UI, and is the starting point for visual rendering on launch
 package com.turtledsr.launcher.include.ui.launcher;
 
 import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -91,13 +96,14 @@ public final class Window extends JFrame {
     setActivePanel(MAIN);
 
     setVisible(true);
+    toFront();
     
     pack();
     
     if(!SettingsManager.settings.uiSettings.preserveWindowPosition || SettingsManager.settings.persistenceSettings.windowPosition == null || SettingsManager.settings.persistenceSettings.windowPosition.x == null) {
-      setLocation((screen.width / 2) - (getWidth() / 2), (screen.height / 2) - (getHeight() / 2)); //go to center of the screen
+      setLocationWithBounds((screen.width / 2) - (getWidth() / 2), (screen.height / 2) - (getHeight() / 2)); //go to center of the screen
     } else {
-      setLocation(SettingsManager.settings.persistenceSettings.windowPosition.x, SettingsManager.settings.persistenceSettings.windowPosition.y); //go to preserved position
+      setLocationWithBounds(SettingsManager.settings.persistenceSettings.windowPosition.x, SettingsManager.settings.persistenceSettings.windowPosition.y); //go to preserved position
     }
   }
 
@@ -120,5 +126,71 @@ public final class Window extends JFrame {
     }
 
     activePanel = panel;
+  }
+
+  public void setLocationWithBounds(int newx, int newy) {
+    int x = newx; 
+    int y = newy;
+    int width = getWidth();
+    int height = getHeight();
+    Rectangle bounds = new Rectangle(x, y, width, height);
+
+    GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    
+    boolean intersectsAnyMonitor = false;
+    Rectangle closestMonitorBounds = null;
+    double closestDistance = Double.MAX_VALUE;
+
+    for (GraphicsDevice device : environment.getScreenDevices()) {
+      GraphicsConfiguration configuration = device.getDefaultConfiguration();
+      Rectangle deviceBounds = configuration.getBounds();
+      Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(configuration);
+
+      insets.bottom += 10; //add small buffer zone so you dont have a single pixel remaining on screen before snapping
+      insets.top += 10;
+      insets.left += 10;
+      insets.right += 10;
+
+      Rectangle viewableBounds = new Rectangle(
+        deviceBounds.x + insets.left,
+        deviceBounds.y + insets.top,
+        deviceBounds.width - insets.left - insets.right,
+        deviceBounds.height - insets.top - insets.bottom
+      );
+
+      if (viewableBounds.intersects(bounds)) {
+        intersectsAnyMonitor = true;
+        break; 
+      }
+
+      double distanceX = Math.max(0, Math.max(viewableBounds.x - (x + width), x - (viewableBounds.x + viewableBounds.width)));
+      double distanceY = Math.max(0, Math.max(viewableBounds.y - (y + height), y - (viewableBounds.y + viewableBounds.height)));
+      double totalDistance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+      if (totalDistance < closestDistance) {
+        closestDistance = totalDistance;
+        closestMonitorBounds = viewableBounds;
+      }
+    }
+
+    if (!intersectsAnyMonitor && closestMonitorBounds != null) {
+      if (x + width > closestMonitorBounds.x + closestMonitorBounds.width) {
+        x = (closestMonitorBounds.x + closestMonitorBounds.width) - width;
+      }
+      if (y + height > closestMonitorBounds.y + closestMonitorBounds.height) {
+        y = (closestMonitorBounds.y + closestMonitorBounds.height) - height;
+      }
+      if (x < closestMonitorBounds.x) {
+        x = closestMonitorBounds.x;
+      }
+      if (y < closestMonitorBounds.y) {
+        y = closestMonitorBounds.y;
+      }
+    }
+    super.setLocation(x, y);
+  }
+
+  public void setLocationWithBounds(Point point) { //add bounds checking
+    setLocationWithBounds(point.x, point.y);
   }
 }

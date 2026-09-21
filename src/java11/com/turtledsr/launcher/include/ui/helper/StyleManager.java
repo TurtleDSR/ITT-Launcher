@@ -21,6 +21,7 @@ public final class StyleManager {
   public static Color title_accent_dark = ColorUtils.hextoColor("#212229");
   
   public static Color background_color = ColorUtils.hextoColor("#1d1f2e");
+  public static Color dark_background_color = ColorUtils.hextoColor("#1a1c29");
   public static Color foreground_color = ColorUtils.hextoColor("#e4e4e4");
   
   public static Color separator_color = ColorUtils.hextoColor("#52556d");
@@ -49,5 +50,7 @@ public final class StyleManager {
   public static Color tool_button_hover_color = ColorUtils.hextoColor("#9c77a3");
 
   public static final Dimension MESSAGE_BOX_SIZE = new Dimension(300, 200);
+  public static final Dimension MESSAGE_BOX_BUTTON_SIZE = new Dimension(80, 25);
   public static final int MESSAGE_BOX_TITLEBAR_HEIGHT = 20;
+  public static final int MESSAGE_BOX_MESSAGE_HEIGHT = 134;
 }

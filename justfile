@@ -18,7 +18,7 @@ debug:
 [parallel]
 test folder=".debug": shutdown-app build-J build-C
   @just copy {{folder}}
-  @build/{{folder}}/ITT-launcher.exe &
+  @build/{{folder}}/ITT-launcher.exe -suppress_messages &
   @just zip {{folder}}
 
 #build java launcher
@@ -28,22 +28,39 @@ build-J:
   gradle build
   gradle buildRuntime
 
+#build c executables
+[group: 'exe']
+[windows]
+[parallel]
+build-C: build-Launch build-Update
+
 #build c wrapper executable
 [group: 'exe']
 [windows]
-build-C:
+build-Launch:
   @#create icon image for the exe
   @just update-ico
 
   @#create missing directories
-  @[ -d build/c ] || mkdir -p build/c
-  @[ -d build/tmp/c ] || mkdir -p build/tmp/c
+  @[ -d build/launch ] || mkdir -p build/launch
+  @[ -d build/tmp/launch ] || mkdir -p build/tmp/launch
 
   @#compile resources
-  llvm-rc src/launch/launch.rc -fo build/tmp/c/launch.res
+  llvm-rc src/launch/launch.rc -fo build/tmp/launch/launch.res
 
   @#compile c
-  clang -O3 src/launch/launch.c build/tmp/c/launch.res -o build/c/ITT-launcher.exe -static -lshell32
+  clang -O3 src/launch/launch.c build/tmp/launch/launch.res -o build/launch/ITT-launcher.exe -static -lshell32
+
+#build c update executable
+[group: 'exe']
+[windows]
+build-Update:
+  @#create missing directories
+  @[ -d build/update ] || mkdir -p build/update
+  @[ -d build/tmp/update ] || mkdir -p build/tmp/update
+
+  @#compile launch.c
+  clang -O3 src/update/update.c src/update/zip.c -Isrc/update/include -o build/update/update.exe -static -lshell32
 
 #update executable icon
 [group: 'exe']
@@ -75,12 +92,20 @@ copy folder=".build":
   @echo copy jre
   cp -r build/jre/ build/{{folder}}/ &
 
-  @#copy exe's
-  @echo copy exe
-  cp build/c/*.exe build/{{folder}}/ &
+  @#copy exe
+  @echo copy launch
+  cp build/launch/*.exe build/{{folder}}/ &
+
+  @#copy exe
+  @echo copy update
+  cp build/update/*.exe build/{{folder}}/ &
+
+  @#copy dll
+  @echo copy dll
+  cp lib/dll/*.dll build/{{folder}}/ &
 
   @#copy readme
-  @echo copy exe
+  @echo copy readme
   cp readme.md build/{{folder}}/ &
 
 #attempt to close application if its open (assumes default port)

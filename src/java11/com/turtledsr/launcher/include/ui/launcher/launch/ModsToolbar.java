@@ -28,7 +28,6 @@ public final class ModsToolbar extends JPanel {
   public static ToggleModsButton toggleModsButton;
 
   public static RoundedFlatButton modsFolderButton;
-  public static RoundedFlatButton refreshModsButton;
 
   public ModsToolbar() {
     super(new GridBagLayout());
@@ -62,25 +61,6 @@ public final class ModsToolbar extends JPanel {
       }
     });
 
-    if(refreshModsButton == null) refreshModsButton = new RoundedFlatButton("Refresh Mods", StyleManager.launch_button_color);
-    refreshModsButton.setPreferredSize(new Dimension(125, StyleManager.LAUNCH_PANEL_HEIGHT - 15));
-    refreshModsButton.setFont(new Font("Segoe UI", Font.BOLD, 16));
-    refreshModsButton.addMouseListener(new MouseAdapter() {
-      public void mouseEntered(MouseEvent e) {
-        refreshModsButton.setBackground(StyleManager.launch_button_hover_color);
-      };
-
-      public void mouseExited(MouseEvent e) {
-        refreshModsButton.setBackground(StyleManager.launch_button_color);
-      };
-    });
-    refreshModsButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        ModsListPanel.refreshMods();
-      }
-    });
-
     GridBagConstraints c = new GridBagConstraints();
     c.anchor = GridBagConstraints.WEST;
     c.fill = GridBagConstraints.NONE;
@@ -91,9 +71,6 @@ public final class ModsToolbar extends JPanel {
     c.weighty = 1;
 
     add(modsFolderButton, c);
-    c.gridx += 1;
-
-    add(refreshModsButton, c);
     c.gridx += 1;
 
     if(launchRankedButton != null) {

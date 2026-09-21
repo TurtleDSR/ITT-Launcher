@@ -21,6 +21,7 @@ import javax.swing.SwingUtilities;
 
 import com.turtledsr.launcher.include.control.Process;
 import com.turtledsr.launcher.include.struct.Mod;
+import com.turtledsr.launcher.include.struct.Mod.Format;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.launcher.launch.ModsListPanel;
@@ -37,14 +38,14 @@ public final class ModIndex extends RoundedPanel implements ActionListener {
   public ModIndex(Mod mod) {
     super(new GridBagLayout(), CORNER_ROUNDING);
 
-    setPreferredSize(new Dimension(StyleManager.PANEL_SIZE.width - 15,
-        (StyleManager.PANEL_SIZE.height - StyleManager.LAUNCH_PANEL_HEIGHT - 7) / ModsListPanel.MODCOUNT));
+    setPreferredSize(new Dimension(StyleManager.PANEL_SIZE.width - (ModsListPanel.mods.size() >= 10 ? 33 : 20),
+      (StyleManager.PANEL_SIZE.height - StyleManager.LAUNCH_PANEL_HEIGHT - 7) / 10));
     setBackground(StyleManager.background_color);
 
     GridBagConstraints c = new GridBagConstraints();
     c.anchor = GridBagConstraints.WEST;
     c.fill = GridBagConstraints.NONE;
-    c.insets = new Insets(0, 10, 0, 0);
+    c.insets = new Insets(0, 10, 0, 10);
     c.weightx = 1;
     c.weighty = 1;
     c.gridx = 0;
@@ -55,7 +56,11 @@ public final class ModIndex extends RoundedPanel implements ActionListener {
     modLabel.setForeground(StyleManager.foreground_color);
 
     if(mod != null) {
-      modLabel.setText(mod.name);
+      if(mod.format == Format.zip) {
+        modLabel.setText("<html>" + mod.name + "<font color='red'>*</html>");
+      } else {
+        modLabel.setText(mod.name);
+      }
     }
 
     toggle = new ModToggleButton(false);
@@ -81,7 +86,7 @@ public final class ModIndex extends RoundedPanel implements ActionListener {
 
     c.weightx = 0;
     c.anchor = GridBagConstraints.EAST;
-    c.insets = new Insets(0, 10, 0, 10);
+    c.insets = new Insets(0, 0, 0, 5);
     c.gridx += 1;
     add(toggle, c);
 
@@ -115,9 +120,18 @@ public final class ModIndex extends RoundedPanel implements ActionListener {
     }
 
     setVisible(true);
-    modLabel.setText(mod.name);
+    if(mod != null) {
+      if(mod.format == Format.zip) {
+        modLabel.setText("<html>" + mod.name + "<font color='red'>*</html>");
+      } else {
+        modLabel.setText(mod.name);
+      }
+    }
     toggle.toggled = mod.toggled;
     toggle.update();
+
+    setPreferredSize(new Dimension(StyleManager.PANEL_SIZE.width - (ModsListPanel.mods.size() >= 10 ? 33 : 20),
+      (StyleManager.PANEL_SIZE.height - StyleManager.LAUNCH_PANEL_HEIGHT - 7) / 10));
   }
 
   @Override
@@ -139,8 +153,8 @@ class DragAdapter extends MouseAdapter {
   public void mousePressed(MouseEvent e) {
     if(parent.mod == null) return;
 
-    for (int i = 0; i < ModsListPanel.MODCOUNT; i++) {
-      if (ModsListPanel.modButtons[i] == parent) {
+    for (int i = 0; i < ModsListPanel.modButtons.size(); i++) {
+      if (ModsListPanel.modButtons.get(i) == parent) {
         activeSlotIndex = i;
         break;
       }
@@ -160,20 +174,17 @@ class DragAdapter extends MouseAdapter {
     if (targetSlot < 0) {
       targetSlot = 0;
     }
-    if (targetSlot >= ModsListPanel.MODCOUNT) {
-      targetSlot = ModsListPanel.MODCOUNT - 1;
+    if (targetSlot >= ModsListPanel.modButtons.size()) {
+      targetSlot = ModsListPanel.modButtons.size() - 1;
     }
 
-    int currentActualIndex = activeSlotIndex + ModsListPanel.startingModIndex;
-    int targetActualIndex = targetSlot + ModsListPanel.startingModIndex;
-
-    if (targetSlot != activeSlotIndex && targetActualIndex < ModsListPanel.mods.size() && targetActualIndex >= 0) {
-      Mod movingMod = ModsListPanel.mods.remove(currentActualIndex);
-      ModsListPanel.mods.add(targetActualIndex, movingMod);
+    if (targetSlot != activeSlotIndex && targetSlot < ModsListPanel.mods.size() && targetSlot >= 0) {
+      Mod movingMod = ModsListPanel.mods.remove(activeSlotIndex);
+      ModsListPanel.mods.add(targetSlot, movingMod);
 
       activeSlotIndex = targetSlot;
-      ModsListPanel.updateModList();
       Process.updateModListCache(ModsListPanel.mods);
+      ModsListPanel.refreshMods();
 
       parent.getParent().revalidate();
       parent.getParent().repaint();

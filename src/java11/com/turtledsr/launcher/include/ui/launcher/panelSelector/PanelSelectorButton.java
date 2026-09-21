@@ -46,7 +46,7 @@ public final class PanelSelectorButton extends JPanel implements MouseListener {
     GridBagConstraints c = new GridBagConstraints();
     
     setBackground(StyleManager.selector_color);
-    setPreferredSize(new Dimension(120, StyleManager.SELECTOR_HEIGHT));
+    setPreferredSize(new Dimension(114, StyleManager.SELECTOR_HEIGHT));
     
     boundPanel = panel;
 

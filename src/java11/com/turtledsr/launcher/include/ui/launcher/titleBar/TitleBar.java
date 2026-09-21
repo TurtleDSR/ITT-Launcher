@@ -76,6 +76,8 @@ public final class TitleBar extends JPanel {
       @Override
       public void mouseReleased(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1) {
+          Main.window.setLocationWithBounds(Main.window.getLocation());
+
           if(SettingsManager.settings.uiSettings.preserveWindowPosition) {
             if(SettingsManager.settings.persistenceSettings.windowPosition == null) SettingsManager.settings.persistenceSettings.windowPosition = new PersistenceSettings.WindowPosition();
             SettingsManager.settings.persistenceSettings.windowPosition.x = Main.window.getLocation().x;

@@ -6,6 +6,7 @@ package com.turtledsr.launcher.include.ui.helper;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -18,8 +19,11 @@ public final class FontManager {
   public static Font poppins;
 
   public static void loadFonts() {
+    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    
     poppins = loadFontFile("font/Poppins-Regular.ttf");
     if(poppins != null) poppins = poppins.deriveFont(FONT_SIZE);
+    ge.registerFont(poppins);
   }
 
   private static Font loadFontFile(String path) {

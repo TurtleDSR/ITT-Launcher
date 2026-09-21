@@ -8,6 +8,7 @@ package com.turtledsr.launcher.include.ui.launcher.rootPanels;
 
 import com.turtledsr.launcher.include.config.SettingsManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
+import com.turtledsr.launcher.include.ui.launcher.configs.ConfigListPanel;
 import com.turtledsr.launcher.include.ui.launcher.debug.LogPanel;
 import com.turtledsr.launcher.include.ui.launcher.launch.ModsPanel;
 import com.turtledsr.launcher.include.ui.launcher.panelSelector.PanelSelector;
@@ -20,14 +21,16 @@ import java.awt.Insets;
 
 public final class MainPanel extends AbstractRootPanel {
   public static final int LAUNCHER = 0;
-  public static final int RANKED = 1;
-  public static final int TOOLS = 2;
-  public static final int LOGS = 3;
+  public static final int CONFIGS = 1;
+  public static final int RANKED = 2;
+  public static final int TOOLS = 3;
+  public static final int LOGS = 4;
 
   public static PanelSelector panelSelector;
 
-  public static ModsPanel launcherPanel;
+  public static ModsPanel modsPanel;
   public static RankedPanel rankedPanel;
+  public static ConfigListPanel configsPanel;
   public static ToolsPanel toolsPanel;
   public static LogPanel logPanel;
 
@@ -53,8 +56,9 @@ public final class MainPanel extends AbstractRootPanel {
 
     if(panelSelector == null) panelSelector = new PanelSelector();
 
-    if(launcherPanel == null) launcherPanel = new ModsPanel();
+    if(modsPanel == null) modsPanel = new ModsPanel();
     if(rankedPanel == null) rankedPanel = new RankedPanel();
+    if(configsPanel == null) configsPanel = new ConfigListPanel();
     if(toolsPanel == null) toolsPanel = new ToolsPanel();
     if(logPanel == null) logPanel = new LogPanel();
 
@@ -63,8 +67,9 @@ public final class MainPanel extends AbstractRootPanel {
     add(panelSelector, c);
     c.gridy += 1;
 
-    add(launcherPanel, c);
+    add(modsPanel, c);
     add(rankedPanel, c);
+    add(configsPanel, c);
     add(toolsPanel, c);
     add(logPanel, c);
 
@@ -74,8 +79,9 @@ public final class MainPanel extends AbstractRootPanel {
   }
 
   private static void setPanelsInvis() {
-    launcherPanel.setVisible(false);
+    modsPanel.setVisible(false);
     rankedPanel.setVisible(false);
+    configsPanel.setVisible(false);
     toolsPanel.setVisible(false);
     logPanel.setVisible(false);
   }
@@ -83,13 +89,18 @@ public final class MainPanel extends AbstractRootPanel {
   public static void setSelectedPanel(int panel) {
     setPanelsInvis();
     if(panel == LAUNCHER) {
-      launcherPanel.setVisible(true);
-      launcherPanel.requestFocusInWindow();
+      modsPanel.setVisible(true);
+      modsPanel.requestFocusInWindow();
     }
 
     if(panel == RANKED) {
       rankedPanel.setVisible(true);
       rankedPanel.requestFocusInWindow();
+    }
+
+    if(panel == CONFIGS) {
+      configsPanel.setVisible(true);
+      configsPanel.requestFocusInWindow();
     }
 
     if(panel == TOOLS) {

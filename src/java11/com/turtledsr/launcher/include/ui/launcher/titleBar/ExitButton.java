@@ -48,7 +48,7 @@ public final class ExitButton extends FlatButton {
     addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        if(Process.gameStatus == Process.STOPPED) { //stop launcher if game is stopped
+        if(Process.gameStatus == Process.STOPPED && !Main.updating.get()) { //stop launcher if game is stopped
           Logs.log("CLOSING APPLICATION", "EXITBUTTON");
           System.exit(0);
         } else { //if game is running in any capacity hide to tray rather than close
