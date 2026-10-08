@@ -398,11 +398,6 @@ public final class Process {
 
       File[] files = modFolder.listFiles();
 
-      if (files == null || files.length == 0) {
-        Logs.logError("NO MODS FOUND", "PROCESS");
-        return null;
-      }
-
       for (File f : files) {
         if (f == null)
           continue;

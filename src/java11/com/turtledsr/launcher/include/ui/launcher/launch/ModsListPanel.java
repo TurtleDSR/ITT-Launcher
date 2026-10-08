@@ -33,7 +33,11 @@ public final class ModsListPanel extends JPanel {
     removeAll();
 
     setBackground(StyleManager.background_color);
-    setPreferredSize(new Dimension(modButtons.get(0).getPreferredSize().width, modButtons.size() * modButtons.get(0).getPreferredSize().height));
+    if(modButtons.size() > 0) {
+      setPreferredSize(new Dimension(modButtons.get(0).getPreferredSize().width, modButtons.size() * modButtons.get(0).getPreferredSize().height));
+    } else {
+      setPreferredSize(new Dimension(0, 0));
+    }
 
     GridBagConstraints c = new GridBagConstraints();
     c.anchor = GridBagConstraints.NORTH;
