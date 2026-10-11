@@ -50,7 +50,7 @@ public final class DXManager {
             new MessageBox("DX12 Failure", "ERROR: Failed To Install DX12\nDM me on discord with a screenshot of the logs tab, I will try to help");
           }
         }
-      }, "game_disconnected");
+      }, "game_disconnected", true);
       Process.launchItTakesTwoEx(false);
       return;
     } else {

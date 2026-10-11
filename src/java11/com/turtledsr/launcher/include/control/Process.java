@@ -64,7 +64,7 @@ public final class Process {
   private static String steamDirectory;
   private static String shaderCacheHash;
 
-  private static AtomicBoolean cleaningScripts = new AtomicBoolean(false);
+  public static AtomicBoolean cleaningScripts = new AtomicBoolean(false);
   private static Object cleaningLock = new Object();
 
   private static GameConfigList gameConfigs = null;
