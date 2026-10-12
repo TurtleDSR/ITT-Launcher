@@ -108,6 +108,10 @@ copy folder=".build":
   @echo copy readme
   cp readme.md build/{{folder}}/ &
 
+  @#copy license
+  @echo copy license
+  cp LICENSE build/{{folder}}/ &
+
 #attempt to close application if its open (assumes default port)
 [group: 'util']
 [windows]
