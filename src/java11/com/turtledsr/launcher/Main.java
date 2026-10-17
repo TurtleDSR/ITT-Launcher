@@ -22,6 +22,7 @@ import java.net.Socket;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchKey;
@@ -40,11 +41,13 @@ import com.turtledsr.launcher.include.engine.Logs;
 import com.turtledsr.launcher.include.engine.SingleInstanceManager;
 import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
+import com.turtledsr.launcher.include.struct.Mod;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.ImageManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.launcher.Window;
 import com.turtledsr.launcher.include.ui.launcher.debug.LogPanel;
+import com.turtledsr.launcher.include.ui.launcher.launch.ModsListPanel;
 import com.turtledsr.launcher.include.ui.launcher.rootPanels.MainPanel;
 import com.turtledsr.launcher.include.ui.styled.button.RoundedFlatButton;
 import com.turtledsr.launcher.include.ui.styled.messageBox.MessageBox;
@@ -198,6 +201,12 @@ public final class Main {
       );
     }
 
+    int modArgIndex = modArgIndex();
+    if(modArgIndex != -1) {
+      String modPath = getModPath(modArgIndex);
+      importMod(modPath);
+    }
+
     Process.cleanScriptsAsync();
 
     Process.getGameConfigs();
@@ -331,6 +340,11 @@ public final class Main {
       while((input = reader.readLine()) != null) {
         Logs.log("ServerSocket Recieved Message: " + input, "SERVER_SOCKET_THREAD");
 
+        if(input.startsWith("mod|-f'")) {
+          String modPath = input.substring(7, input.length() - 2);
+          importMod(modPath);
+        }
+
         if(input.equalsIgnoreCase("show_debug_message")) {
           new MessageBox("Debug", "Test Message!<br><br>The quick brown fox jumps over the lazy dog");
         }
@@ -446,6 +460,81 @@ public final class Main {
     }
   }
 
+  public static void importMod(String modPath) {
+    try {
+      String modPathNoExt = modPath.substring(Math.max(modPath.lastIndexOf("\\"), modPath.lastIndexOf("/")) + 1);
+      final String modName = modPathNoExt.substring(0, modPathNoExt.lastIndexOf("."));
+
+      Files.move(Paths.get(modPath), Paths.get(Process.getGameDirectory() + "Mods/" + modName + ".hazemod"), StandardCopyOption.REPLACE_EXISTING);
+      ModsListPanel.refreshMods();
+
+      RoundedFlatButton yesButton = new RoundedFlatButton("Yes", StyleManager.launch_button_color);
+      yesButton.setPreferredSize(new Dimension(80, 25));
+      yesButton.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseEntered(MouseEvent e) {
+          yesButton.setBackground(StyleManager.launch_button_hover_color);
+        }
+        @Override
+        public void mouseExited(MouseEvent e) {
+          yesButton.setBackground(StyleManager.launch_button_color);
+        }
+      });
+
+      RoundedFlatButton noButton = new RoundedFlatButton("No", StyleManager.launch_button_color);
+      noButton.setPreferredSize(new Dimension(80, 25));
+      noButton.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseEntered(MouseEvent e) {
+          noButton.setBackground(StyleManager.launch_button_hover_color);
+        }
+        @Override
+        public void mouseExited(MouseEvent e) {
+          noButton.setBackground(StyleManager.launch_button_color);
+        }
+      });
+
+      RoundedFlatButton[] buttons = new RoundedFlatButton[2];
+      buttons[0] = noButton;
+      buttons[1] = yesButton;
+
+      MessageBox box = new MessageBox(
+        "Mod Imported: " + modName,
+        "Would you like to toggle it on?",
+        buttons
+      );
+
+      yesButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          for (Mod m : ModsListPanel.mods) {
+            if(m.name.equals(modName)) {
+              m.toggled = true;
+              Process.updateModListCache(ModsListPanel.mods);
+              ModsListPanel.updateModButtonList();
+              box.dispose();
+            }
+          }
+          box.dispose();
+        }
+      });
+
+      noButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          box.dispose();
+        }
+      });
+
+    } catch(Exception e) {
+      new MessageBox(
+        "Error importing mod",
+        e.getLocalizedMessage()
+      );
+      Logs.logError("Error importing mod: " + e.getLocalizedMessage(), "MAIN");
+    }
+  }
+
   private static void createTrayMenu() {
     trayMenu = new PopupMenu();
 
@@ -487,5 +576,31 @@ public final class Main {
 
   public static boolean argumentPresent(String argument) {
     return Arrays.stream(args).anyMatch(arg -> arg.equals(argument));
+  }
+
+  public static int modArgIndex() {
+    for(int i = 0; i < args.length; i++) {
+      if(args[i].startsWith("-f")) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  public static String getModPath(int startingindex) {
+    String out = "";
+    String current = "";
+
+    int i = startingindex;
+    while(!current.endsWith("'")) {
+      current = args[i];
+
+      if(i != startingindex) out += " ";
+      out += current;
+
+      i++;
+    }
+
+    return out.substring(3, out.length() - 1);
   }
 }

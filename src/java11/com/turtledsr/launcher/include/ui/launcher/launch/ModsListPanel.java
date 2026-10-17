@@ -59,6 +59,10 @@ public final class ModsListPanel extends JPanel {
     setOpaque(true);
     revalidate();
     repaint();
+
+    //try again to fix visual bug
+    revalidate();
+    repaint();
   }
 
   public static void updateModButtonList() {
