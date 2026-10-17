@@ -157,8 +157,10 @@ public final class Process {
                 //Logs.log("Installing mod: " + mod.name, "PROCESS");
                 //Logs.log("FORMAT: " + mod.format, "PROCESS");
                 if(mod.format == Format.hazemod) {
-                  //Logs.log("ASMOD", "PROCESS");
-                  if(!ModLib.install_mod_asmod(context, getGameDirectory() + "Mods/" + ModsListPanel.mods.get(i).name + ".asmod")) {
+                  //Logs.log("HAZEMOD", "PROCESS");
+
+                  //called asmod here because the zig rewrite will have a better system so I'm not going to update as_mod_lib_c function names
+                  if(!ModLib.install_mod_asmod(context, getGameDirectory() + "Mods/" + ModsListPanel.mods.get(i).name + ".hazemod")) {
                     EventManager.triggerEvent("mod_inject_failure");
                     ModLib.destroy(context);
                     return null;
@@ -412,6 +414,7 @@ public final class Process {
         String name = fullname.substring(0, partition);
         Format format = extension.equalsIgnoreCase("zip") ? Format.zip : Format.hazemod;
 
+        //migrate any asmod files to hazemod since some users already have mods.
         if(extension.equalsIgnoreCase("asmod")) {
           String new_name = name + ".hazemod";
           Logs.log(new_name);

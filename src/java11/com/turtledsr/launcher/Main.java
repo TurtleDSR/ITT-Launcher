@@ -48,7 +48,7 @@ import com.turtledsr.launcher.include.ui.styled.messageBox.MessageBox;
 
 public final class Main {
   public static final String TITLE = "It Takes Two Launcher";
-  public static final String VERSION = "2.0.5";
+  public static final String VERSION = "2.0.6";
 
   public static final int RECONNECTION_INTERVAL = 500;
   public static boolean scriptCacheEnabled = Process.getScriptCacheEnabled();
@@ -172,7 +172,7 @@ public final class Main {
     if(Process.zipFormatPresent && !argumentPresent("-suppress_messages")) new MessageBox(
       "Zip format mods found",
       "All mods with a <span style=\"color: 'red';\">*</span> are outdated and use the zip format. " +
-      "Either update to the newest version of the mod or ask the developer to make a .asmod port."
+      "Either update to the newest version of the mod or ask the developer to make a hazemod port."
     );
 
     if(argumentPresent("-update") && !argumentPresent("-suppress_messages")) {
