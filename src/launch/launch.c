@@ -2,22 +2,51 @@
 #pragma comment(lib, "user32.lib")
 
 #include <windows.h>
-#include <stdio.h>
 #include <shlobj.h>
+#include <stdio.h>
 
 int main(int argc, char** argv) {
-  SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL); //update icon
-
   char exe_path[MAX_PATH];
+  char icon_path[MAX_PATH];
   char dir[MAX_PATH];
+
+  char mod_command[MAX_PATH + 32];
   char command_line[MAX_PATH * 3];
 
-  GetModuleFileNameA(NULL, exe_path, MAX_PATH);
+  GetModuleFileNameA(NULL, exe_path, MAX_PATH); //get current executable path
 
-  char *last_backslash = strrchr(exe_path, '\\');
-  if (last_backslash != NULL) {
-    *last_backslash = '\0';
+  strcpy_s(dir, sizeof(dir), exe_path); //get working directory
+  char *lastSlash = strrchr(dir, '\\');
+  if (lastSlash) *lastSlash = '\0';
+
+  //hazemod file icon
+  HKEY hKey;
+
+  snprintf(icon_path, sizeof(icon_path), "\"%s\",1", exe_path);
+  snprintf(mod_command, sizeof(mod_command), "\"%s\" \"%%1\"", exe_path);
+
+  if (RegCreateKeyExA(HKEY_CURRENT_USER, "Software\\Classes\\.hazemod", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) == ERROR_SUCCESS) {
+    RegSetValueExA(hKey, "", 0, REG_SZ, (const BYTE*)"ITT-Launcher.Hazemod", (DWORD)(strlen("ITT-Launcher.Hazemod") + 1));
+    RegCloseKey(hKey);
   }
+
+  if (RegCreateKeyExA(HKEY_CURRENT_USER, "Software\\Classes\\ITT-Launcher.Hazemod", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) == ERROR_SUCCESS) {
+    RegSetValueExA(hKey, "", 0, REG_SZ, (const BYTE*)"Hazemod", (DWORD)(strlen("Hazemod") + 1));
+    RegSetValueExA(hKey, "PerceivedType", 0, REG_SZ, (const BYTE*)"document", (DWORD)(strlen("document") + 1));
+    RegCloseKey(hKey);
+  }
+
+  if (RegCreateKeyExA(HKEY_CURRENT_USER, "Software\\Classes\\ITT-Launcher.Hazemod\\DefaultIcon", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) == ERROR_SUCCESS) {
+    RegSetValueExA(hKey, "", 0, REG_SZ, (const BYTE*)icon_path, (DWORD)(strlen(icon_path) + 1));
+    RegCloseKey(hKey);
+  }
+
+  if (RegCreateKeyExA(HKEY_CURRENT_USER, "Software\\Classes\\ITT-Launcher.Hazemod\\shell\\open\\command", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) == ERROR_SUCCESS) {
+    RegSetValueExA(hKey, "", 0, REG_SZ, (const BYTE*)mod_command, (DWORD)(strlen(mod_command) + 1));
+    RegCloseKey(hKey);
+  }
+
+  SHChangeNotify(SHCNE_ASSOCCHANGED, SHCNF_IDLIST, NULL, NULL); //update icon
 
   printf("arg count: %d\n\n", argc);
 
@@ -44,11 +73,6 @@ int main(int argc, char** argv) {
   }
 
   printf("args: %s len: %zu\n\n", args, args_len);
-
-  if(strcpy_s(dir, MAX_PATH, exe_path) != 0) {
-    free(args);
-    return -1;
-  }
 
   sprintf_s(command_line, sizeof(command_line), 
     "\"%s/jre/bin/javaw.exe\" -jar \"%s/ITT-launcher.jar\" %s",

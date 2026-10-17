@@ -49,7 +49,7 @@ build-Launch:
   llvm-rc src/launch/launch.rc -fo build/tmp/launch/launch.res
 
   @#compile c
-  clang -O3 src/launch/launch.c build/tmp/launch/launch.res -o build/launch/ITT-launcher.exe -static -lshell32
+  clang -O3 src/launch/launch.c build/tmp/launch/launch.res -o build/launch/ITT-launcher.exe -static -lshell32 -ladvapi32
 
 #build c update executable
 [group: 'exe']
@@ -67,6 +67,7 @@ build-Update:
 [windows]
 update-ico:
   magick src/java11/resources/img/icon.png src/launch/icon.ico &
+  magick src/java11/resources/img/mod_icon.png src/launch/mod_icon.ico &
 
 #zip files
 [group: 'package']
