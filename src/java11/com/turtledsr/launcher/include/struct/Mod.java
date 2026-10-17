@@ -15,11 +15,11 @@ public final class Mod {
   }
 
   public Mod(String name, boolean toggled) {
-    this(name, toggled, Format.asmod);
+    this(name, toggled, Format.hazemod);
   }
 
   public Mod(String name) {
-    this(name, false, Format.asmod);
+    this(name, false, Format.hazemod);
   }
 
   public Mod() {
@@ -38,7 +38,7 @@ public final class Mod {
   }
 
   public enum Format {
-    asmod,
+    hazemod,
     zip
   }
 }

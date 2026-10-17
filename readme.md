@@ -10,3 +10,5 @@ Credit to the authors and contributors of the external libraries used:
   JNA
   zip4j
   UpdateChecker by technicjelle
+
+Thanks to Glint for the icon.

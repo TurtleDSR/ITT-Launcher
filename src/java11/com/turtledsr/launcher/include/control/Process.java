@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -155,7 +156,7 @@ public final class Process {
               if (mod.toggled) {
                 //Logs.log("Installing mod: " + mod.name, "PROCESS");
                 //Logs.log("FORMAT: " + mod.format, "PROCESS");
-                if(mod.format == Format.asmod) {
+                if(mod.format == Format.hazemod) {
                   //Logs.log("ASMOD", "PROCESS");
                   if(!ModLib.install_mod_asmod(context, getGameDirectory() + "Mods/" + ModsListPanel.mods.get(i).name + ".asmod")) {
                     EventManager.triggerEvent("mod_inject_failure");
@@ -409,9 +410,23 @@ public final class Process {
 
         String extension = fullname.substring(partition + 1);
         String name = fullname.substring(0, partition);
-        Format format = extension.equalsIgnoreCase("asmod") ? Format.asmod : Format.zip;
+        Format format = extension.equalsIgnoreCase("zip") ? Format.zip : Format.hazemod;
 
-        if (extension.equalsIgnoreCase("zip") || extension.equalsIgnoreCase("asmod")) {
+        if(extension.equalsIgnoreCase("asmod")) {
+          String new_name = name + ".hazemod";
+          Logs.log(new_name);
+
+          try {
+            Files.move(f.toPath(), Paths.get(modFolder.getAbsolutePath(), new_name), StandardCopyOption.REPLACE_EXISTING);
+          } catch(IOException e) {
+            Logs.logError("Failed to migrate asmod to hazemod: " + fullname + ": " + e.getLocalizedMessage(), "PROCESS");
+          }
+
+          extension = "hazemod";
+          fullname = new_name;
+        }
+
+        if (extension.equalsIgnoreCase("zip") || extension.equalsIgnoreCase("hazemod")) {
           if (!(name.equals("Default") || name.equals("Backup") ||  name.equals("Default-Game-Backup"))) {  //check if zip is default scripts folder
             //Logs.log("Found mod formatted ." + format + " name: " + name, "PROCESS");
             directory.add(new Mod(name, false, format));
