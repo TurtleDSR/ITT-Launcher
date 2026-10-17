@@ -14,12 +14,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
@@ -88,20 +91,33 @@ public final class Main {
 
     Main.args = args;
 
-    Logs.log(String.format("Arguments (%s): %s", args.length, allArgs), "MAIN");
-
     if(SingleInstanceManager.checkIfAlreadyRunning()) { //check if program is already running
       SettingsManager.loadSettings(false); //dont hook settings to update on close
-
+      
       Socket messenger = new Socket("localhost", SettingsManager.settings.developerSettings.socketPort); //tell launcher to restore window if its in the tray
       messenger.getOutputStream().write("restore_window".getBytes());
       messenger.getOutputStream().flush();
       messenger.close();
+
+      if(allArgs.length() >= 2 && allArgs.substring(0, 2).equals("-f")) { //send mod file arg if present
+        messenger = new Socket("localhost", SettingsManager.settings.developerSettings.socketPort); 
+        messenger.getOutputStream().write(("mod|" + allArgs).getBytes());
+        messenger.getOutputStream().flush();
+        messenger.close();
+      }
       System.exit(0); //close program
     };
-
+    
     SettingsManager.loadSettings(); //load settings from settings.json file
 
+    if(SettingsManager.settings.developerSettings.devMode) { //overwrite log file
+      File logFile = new File("Logs/log.txt");
+      logFile.getParentFile().mkdir();
+      Files.writeString(logFile.toPath(), "", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+    Logs.log(String.format("Arguments (%s): %s", args.length, allArgs), "MAIN");
+    
     serverThread = new Thread(() -> startServerSocketThread());
     serverThread.setDaemon(true);
     serverThread.start();

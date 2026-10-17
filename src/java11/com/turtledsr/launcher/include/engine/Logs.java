@@ -8,11 +8,15 @@ Uses Swing Worker to make sure UI is still responsive
 
 package com.turtledsr.launcher.include.engine;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.SwingWorker;
 
+import com.turtledsr.launcher.include.config.SettingsManager;
 import com.turtledsr.launcher.include.ui.launcher.rootPanels.MainPanel;
 
 public final class Logs {
@@ -71,8 +75,14 @@ final class LogWorker extends SwingWorker<Void, Void> {
   @Override
   protected Void doInBackground() throws Exception {
     if(error) {
+      if(SettingsManager.settings.developerSettings.devMode) {
+        Files.writeString(Paths.get("Logs/log.txt"), text + "\n", StandardOpenOption.APPEND);
+      }
       System.err.println(text);
     } else {
+      if(SettingsManager.settings.developerSettings.devMode) {
+        Files.writeString(Paths.get("Logs/log.txt"), text + "\n", StandardOpenOption.APPEND);
+      }
       System.out.println(text);
     }
     return null;

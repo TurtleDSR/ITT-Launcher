@@ -85,6 +85,9 @@ copy folder=".build":
   @#delete dx12 folder
   @rm -rf build/{{folder}}/dx12/ &
 
+  @#delete Logs folder
+  @rm -rf build/{{folder}}/Logs/ &
+
   @#copy jars
   @echo copy jar
   cp build/libs/*.jar build/{{folder}}/ &

@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
   HKEY hKey;
 
   snprintf(icon_path, sizeof(icon_path), "\"%s\",1", exe_path);
-  snprintf(mod_command, sizeof(mod_command), "\"%s\" \"%%1\"", exe_path);
+  snprintf(mod_command, sizeof(mod_command), "\"%s\" -f'\"%%1\"'", exe_path);
 
   if (RegCreateKeyExA(HKEY_CURRENT_USER, "Software\\Classes\\.hazemod", 0, NULL, 0, KEY_WRITE, NULL, &hKey, NULL) == ERROR_SUCCESS) {
     RegSetValueExA(hKey, "", 0, REG_SZ, (const BYTE*)"ITT-Launcher.Hazemod", (DWORD)(strlen("ITT-Launcher.Hazemod") + 1));
