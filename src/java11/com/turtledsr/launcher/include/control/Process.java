@@ -165,7 +165,7 @@ public final class Process {
               if (mod.toggled) {
                 if(mod.format == Format.hazemod) {
                   Logs.log("Installing mod: " + ModsListPanel.mods.get(i).name, "PROCESS");
-                  com.turtledsr.hazemodlib.Mod cur = new com.turtledsr.hazemodlib.Mod(getGameDirectory() + "Moodes/" + ModsListPanel.mods.get(i).name + ".hazemod");
+                  com.turtledsr.hazemodlib.Mod cur = new com.turtledsr.hazemodlib.Mod(getGameDirectory() + "Mods/" + ModsListPanel.mods.get(i).name + ".hazemod");
                   context.queueMod(cur);
                 } else {
                   Logs.log("Installing mod: " + ModsListPanel.mods.get(i).name, "PROCESS");
