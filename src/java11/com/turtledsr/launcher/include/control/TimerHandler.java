@@ -42,7 +42,7 @@ public final class TimerHandler {
 
       awaitingReconnection = false;
     } catch(Exception e) {
-      Logs.logError(e.getMessage(), "TIMERHANDLER");
+      //Logs.logError(e.getMessage(), "TIMERHANDLER");
       scheduleReconnect(Main.RECONNECTION_INTERVAL);
     }
   }
@@ -64,7 +64,7 @@ public final class TimerHandler {
         }
       }
     }, time, TimeUnit.MILLISECONDS);
-    Logs.log("Scheduling reconnection attempt in " + time + "ms", "TIMERHANDLER");
+    //Logs.log("Scheduling reconnection attempt in " + time + "ms", "TIMERHANDLER");
   }
 
   public static int getCurrentIndex() {

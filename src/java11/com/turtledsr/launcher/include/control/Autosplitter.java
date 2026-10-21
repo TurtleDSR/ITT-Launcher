@@ -220,7 +220,7 @@ public final class Autosplitter {
       running = true;
       awaitingReconnection = false;
     } catch(Exception e) {
-      Logs.logError(e.getMessage(), "AUTOSPLITTER");
+      //Logs.logError(e.getMessage(), "AUTOSPLITTER");
       scheduleBind(Main.RECONNECTION_INTERVAL);
     }
   }
@@ -233,7 +233,7 @@ public final class Autosplitter {
         bind();
       }
     }, time, TimeUnit.MILLISECONDS);
-    Logs.log("Scheduling bind attempt in " + time + "ms", "AUTOSPLITTER");
+    //Logs.log("Scheduling bind attempt in " + time + "ms", "AUTOSPLITTER");
   }
 
   public static void stop() {

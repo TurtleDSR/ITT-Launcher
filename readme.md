@@ -5,6 +5,8 @@ Currently only supports the Steam build of the game, I will possibly (unlikely) 
 
 If you have any issues running message me on discord @TurtleDSR
 
+The injection framework is an open source zig library on [github](https://github.com/TurtleDSR/haze_mod_lib)
+
 Credit to the authors and contributors of the external libraries used:
   Jackson Project
   JNA

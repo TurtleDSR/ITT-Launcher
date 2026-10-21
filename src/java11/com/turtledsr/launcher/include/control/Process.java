@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -24,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -56,8 +58,7 @@ import com.turtledsr.launcher.include.struct.Mod.Format;
 import com.turtledsr.launcher.include.ui.launcher.launch.ModsListPanel;
 import com.turtledsr.launcher.include.ui.launcher.launch.ToggleModsButton;
 
-import com.turtledsr.modlib.Context;
-import com.turtledsr.modlib.ModLib;
+import com.turtledsr.hazemodlib.ModLib;
 
 public final class Process {
   private static String gameDirectory;
@@ -84,12 +85,10 @@ public final class Process {
   }
 
   public static OptionalInt getProcessPID(String processName, boolean ignoreLetterCase) {
-    Predicate<String> matcher = cmd -> (ignoreLetterCase ? cmd.toLowerCase().contains(processName.toLowerCase())
-        : cmd.contains(processName));
+    Predicate<String> matcher = cmd -> (ignoreLetterCase ? cmd.toLowerCase().contains(processName.toLowerCase()) : cmd.contains(processName));
 
     try (Stream<ProcessHandle> processes = ProcessHandle.allProcesses()) {
-      return processes.filter(p -> p.info().command().filter(matcher).isPresent()).mapToInt(p -> (int) p.pid())
-          .findFirst();
+      return processes.filter(p -> p.info().command().filter(matcher).isPresent()).mapToInt(p -> (int) p.pid()).findFirst();
     }
   }
 
@@ -131,6 +130,20 @@ public final class Process {
   public static void launchItTakesTwoEx(final boolean modsEnabled) { //launches with all current launcher settings
     try {  
       new SwingWorker<Void, Void>() {
+        protected void done() { //fix native error propagation
+          try {
+            get();
+          } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            Logs.logError("Failed to launch game: " + cause.getLocalizedMessage(), "PROCESS");
+            EventManager.triggerEvent("game_launch_failure");
+          } catch (InterruptedException e) {
+            Logs.logError("Failed to launch game: " + e.getLocalizedMessage(), "PROCESS");
+            EventManager.triggerEvent("game_launch_failure");
+            Thread.currentThread().interrupt();
+          }
+        };
+
         @Override
         protected Void doInBackground() {
           EventManager.triggerEvent("game_starting"); //startup event
@@ -143,40 +156,26 @@ public final class Process {
 
           if(modsEnabled) {
             disableScriptCache();
-
-            Context context = ModLib.init(getGameDirectory() + "Nuts/Script/");
-            if(context == null) {
-              EventManager.triggerEvent("mod_inject_failure");
-              return null;
-            }
+            
+            ModLib context = new ModLib(getGameDirectory() + "Nuts/");
 
             //install mods
             for (int i = ModsListPanel.mods.size() - 1; i >= 0; i--) { //top mod gets final priority
               Mod mod = ModsListPanel.mods.get(i);
               if (mod.toggled) {
-                //Logs.log("Installing mod: " + mod.name, "PROCESS");
-                //Logs.log("FORMAT: " + mod.format, "PROCESS");
                 if(mod.format == Format.hazemod) {
-                  //Logs.log("HAZEMOD", "PROCESS");
-
-                  //called asmod here because the zig rewrite will have a better system so I'm not going to update as_mod_lib_c function names
-                  if(!ModLib.install_mod_asmod(context, getGameDirectory() + "Mods/" + ModsListPanel.mods.get(i).name + ".hazemod")) {
-                    EventManager.triggerEvent("mod_inject_failure");
-                    ModLib.destroy(context);
-                    return null;
-                  }
+                  Logs.log("Installing mod: " + ModsListPanel.mods.get(i).name, "PROCESS");
+                  com.turtledsr.hazemodlib.Mod cur = new com.turtledsr.hazemodlib.Mod(getGameDirectory() + "Moodes/" + ModsListPanel.mods.get(i).name + ".hazemod");
+                  context.queueMod(cur);
                 } else {
-                  //Logs.log("ZIP MOD", "PROCESS");
-                  if(!ModLib.install_mod_zip(context, getGameDirectory() + "Mods/" + ModsListPanel.mods.get(i).name + ".zip")) {
-                    EventManager.triggerEvent("mod_inject_failure");
-                    ModLib.destroy(context);
-                    return null;
-                  }
+                  Logs.log("Installing mod: " + ModsListPanel.mods.get(i).name, "PROCESS");
+                  com.turtledsr.hazemodlib.Mod cur = new com.turtledsr.hazemodlib.Mod(getGameDirectory() + "Mods/" + ModsListPanel.mods.get(i).name + ".zip");
+                  context.queueMod(cur);
                 }
               }
             }
 
-            ModLib.destroy(context);
+            context.installMods();
 
             //patch speedtools to use settings from legacy injector
             Path speedSettingsPath = Paths.get(getGameDirectory(), "Nuts/Script/Speed/SpeedSettings.as");
@@ -244,7 +243,7 @@ public final class Process {
         }
       }.execute();
     } catch(Exception e) {
-      Logs.logError("Failed to launch game", "PROCESS");
+      Logs.logError("Failed to launch game: " + e.getLocalizedMessage(), "PROCESS");
       EventManager.triggerEvent("game_launch_failure");
     }
   }
@@ -536,13 +535,27 @@ public final class Process {
     setCleaningFlag(true);
     try {
       Logs.log("Cleaning scripts folder", "PROCESS");
+
+      //clean scripts
       FileHelper.deleteSubfolders(getGameDirectory() + "Nuts/Script/");
       installBackup(Main.getResourceAsStream("mods/Default.zip"));
+
+      //clean paks - we do this last because the engine holds on to paks for a bit after closing.
+      File[] paks = Paths.get(getGameDirectory() + "Nuts/Content/Paks/").toFile().listFiles(new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+          return name.endsWith("_P.pak");
+        }
+      });
+      for (File pak : paks) {
+        Files.delete(pak.toPath());
+      }
     } catch (Exception e) {
       Logs.logError("could not clean scripts: " + e.getMessage(), "PROCESS");
+    } finally {
+      Logs.log("Scripts folder cleaned", "PROCESS");
     }
     setCleaningFlag(false);
-    Logs.log("Scripts folder cleaned", "PROCESS");
   }
 
   public static void cleanScriptsAsync() {
