@@ -422,7 +422,11 @@ public final class Process {
         if (extension.equalsIgnoreCase("zip") || extension.equalsIgnoreCase("hazemod")) {
           if (!(name.equals("Default") || name.equals("Backup") ||  name.equals("Default-Game-Backup"))) {  //check if zip is default scripts folder
             //Logs.log("Found mod formatted ." + format + " name: " + name, "PROCESS");
-            directory.add(new ModHandle(f.getAbsolutePath(), false));
+            try{
+              directory.add(new ModHandle(f.getAbsolutePath(), false));
+            } catch(Exception e) {
+              //ignore
+            }
           }
         }
       }

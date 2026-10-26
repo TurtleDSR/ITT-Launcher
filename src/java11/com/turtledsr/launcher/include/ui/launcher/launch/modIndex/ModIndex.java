@@ -115,6 +115,7 @@ public final class ModIndex extends RoundedPanel implements ActionListener {
     this.mod = mod;
 
     if(mod == null) setVisible(false);
+    update();
   }
 
   public void update() {
@@ -164,6 +165,10 @@ class DragAdapter extends MouseAdapter {
 
   @Override
   public void mousePressed(MouseEvent e) {
+    if(e.getButton() != MouseEvent.BUTTON1) {
+      activeSlotIndex = -1;
+      return;
+    }
     if(parent.mod == null) return;
 
     for (int i = 0; i < ModsListPanel.modButtons.size(); i++) {
@@ -171,6 +176,13 @@ class DragAdapter extends MouseAdapter {
         activeSlotIndex = i;
         break;
       }
+    }
+  }
+
+  @Override
+  public void mouseReleased(MouseEvent e) {
+    if(e.getButton() == MouseEvent.BUTTON3) {
+      //implement mod info widget
     }
   }
 
