@@ -53,11 +53,11 @@ import com.turtledsr.launcher.include.engine.Logs;
 import com.turtledsr.launcher.include.engine.ZipManager;
 import com.turtledsr.launcher.include.engine.events.EventManager;
 import com.turtledsr.launcher.include.struct.ITTASKeybinds;
-import com.turtledsr.launcher.include.struct.Mod;
-import com.turtledsr.launcher.include.struct.Mod.Format;
+import com.turtledsr.launcher.include.struct.ModData;
+import com.turtledsr.launcher.include.struct.ModHandle;
 import com.turtledsr.launcher.include.ui.launcher.launch.ModsListPanel;
 import com.turtledsr.launcher.include.ui.launcher.launch.ToggleModsButton;
-
+import com.turtledsr.hazemodlib.ModFormat;
 import com.turtledsr.hazemodlib.ModLib;
 
 public final class Process {
@@ -161,17 +161,9 @@ public final class Process {
 
             //install mods
             for (int i = ModsListPanel.mods.size() - 1; i >= 0; i--) { //top mod gets final priority
-              Mod mod = ModsListPanel.mods.get(i);
+              ModHandle mod = ModsListPanel.mods.get(i);
               if (mod.toggled) {
-                if(mod.format == Format.hazemod) {
-                  Logs.log("Installing mod: " + ModsListPanel.mods.get(i).name, "PROCESS");
-                  com.turtledsr.hazemodlib.Mod cur = new com.turtledsr.hazemodlib.Mod(getGameDirectory() + "Mods/" + ModsListPanel.mods.get(i).name + ".hazemod");
-                  context.queueMod(cur);
-                } else {
-                  Logs.log("Installing mod: " + ModsListPanel.mods.get(i).name, "PROCESS");
-                  com.turtledsr.hazemodlib.Mod cur = new com.turtledsr.hazemodlib.Mod(getGameDirectory() + "Mods/" + ModsListPanel.mods.get(i).name + ".zip");
-                  context.queueMod(cur);
-                }
+                context.queueMod(mod.mod);
               }
             }
 
@@ -385,11 +377,11 @@ public final class Process {
     return null;
   }
 
-  public static ArrayList<Mod> getModList() {
+  public static ArrayList<ModHandle> getModList() {
     try {
-      ArrayList<Mod> out = new ArrayList<Mod>();
-      List<Mod> cached; //for mod cache
-      ArrayList<Mod> directory = new ArrayList<Mod>(); //mods in the directory
+      ArrayList<ModHandle> out = new ArrayList<ModHandle>();
+      List<ModHandle> cached = new ArrayList<>(); //for mod cache
+      ArrayList<ModHandle> directory = new ArrayList<ModHandle>(); //mods in the directory
 
       zipFormatPresent = false;
 
@@ -411,7 +403,6 @@ public final class Process {
 
         String extension = fullname.substring(partition + 1);
         String name = fullname.substring(0, partition);
-        Format format = extension.equalsIgnoreCase("zip") ? Format.zip : Format.hazemod;
 
         //migrate any asmod files to hazemod since some users already have mods.
         if(extension.equalsIgnoreCase("asmod")) {
@@ -431,7 +422,7 @@ public final class Process {
         if (extension.equalsIgnoreCase("zip") || extension.equalsIgnoreCase("hazemod")) {
           if (!(name.equals("Default") || name.equals("Backup") ||  name.equals("Default-Game-Backup"))) {  //check if zip is default scripts folder
             //Logs.log("Found mod formatted ." + format + " name: " + name, "PROCESS");
-            directory.add(new Mod(name, false, format));
+            directory.add(new ModHandle(f.getAbsolutePath(), false));
           }
         }
       }
@@ -443,29 +434,33 @@ public final class Process {
 
       ModCacheManager.loadCache();
       if(ModCacheManager.cache == null) ModCacheManager.loadCache(); //try again
-      cached = ModCacheManager.cache.mods;
+      List<ModData> temp = ModCacheManager.cache.mods;
+
+      for (ModData modData : temp) {
+        try {
+          cached.add(new ModHandle(modData.path, modData.toggled));
+        } catch(Exception e) {
+          //ignore
+        }
+      }
 
       //Logs.log("Found " + cached.size() + " cached mods", "PROCESS");
 
       for (int i = 0; i < directory.size(); i++) { //add new mods at the top of the list
         if (!cached.contains(directory.get(i))) {
-          Mod current = directory.get(i);
-          if(current.format == Format.zip) zipFormatPresent = true;
+          ModHandle current = directory.get(i);
+          if(current.properties.getFormat() == ModFormat.zip) zipFormatPresent = true;
           out.add(current);
         }
       }
 
       for (int i = 0; i < cached.size(); i++) { // add the rest of the mods in the correct order
-        Mod current = cached.get(i);
+        ModHandle current = cached.get(i);
 
         int pos = directory.indexOf(current);
         if(pos == -1) continue;
 
-        Mod direct = directory.get(pos);
-
-        current.format = direct.format; //update format in case it changed
-
-        if(current.format == Format.zip) zipFormatPresent = true;
+        if(current.properties.getFormat() == ModFormat.zip) zipFormatPresent = true;
         out.add(current);
       }
 
@@ -478,9 +473,12 @@ public final class Process {
     }
   }
 
-  public static void updateModListCache(ArrayList<Mod> modList) {
+  public static void updateModListCache(ArrayList<ModHandle> modList) {
     if(modList == null) return;
-    ModCacheManager.cache.mods = modList;
+    ModCacheManager.cache.mods = new ArrayList<>();
+    for (ModHandle modHandle : modList) {
+      ModCacheManager.cache.mods.add(new ModData(modHandle.properties.getPath(), modHandle.toggled));
+    }
     ModCacheManager.writeCache();
   }
 

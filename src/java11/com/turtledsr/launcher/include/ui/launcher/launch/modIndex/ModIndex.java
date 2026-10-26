@@ -19,23 +19,24 @@ import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
+import com.turtledsr.hazemodlib.ModFormat;
 import com.turtledsr.launcher.include.control.Process;
-import com.turtledsr.launcher.include.struct.Mod;
-import com.turtledsr.launcher.include.struct.Mod.Format;
+import com.turtledsr.launcher.include.struct.ModHandle;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.launcher.launch.ModsListPanel;
 import com.turtledsr.launcher.include.ui.styled.panel.RoundedPanel;
 
 public final class ModIndex extends RoundedPanel implements ActionListener {
-  public Mod mod;
+  public ModHandle mod;
 
   private final static int CORNER_ROUNDING = 12;
 
-  private JLabel modLabel;
+  private JLabel versionLabel;
+  private JLabel nameLabel;
   private ModToggleButton toggle;
 
-  public ModIndex(Mod mod) {
+  public ModIndex(ModHandle mod) {
     super(new GridBagLayout(), CORNER_ROUNDING);
 
     setPreferredSize(new Dimension(StyleManager.PANEL_SIZE.width - (ModsListPanel.mods.size() >= 10 ? 33 : 20),
@@ -43,25 +44,23 @@ public final class ModIndex extends RoundedPanel implements ActionListener {
     setBackground(StyleManager.background_color);
 
     GridBagConstraints c = new GridBagConstraints();
-    c.anchor = GridBagConstraints.WEST;
+    c.anchor = GridBagConstraints.CENTER;
     c.fill = GridBagConstraints.NONE;
-    c.insets = new Insets(0, 10, 0, 10);
+    c.insets = new Insets(0, 7, 0, 0);
     c.weightx = 1;
     c.weighty = 1;
     c.gridx = 0;
     c.gridy = 0;
-    
-    modLabel = new JLabel();
-    modLabel.setFont(FontManager.poppins.deriveFont(Font.BOLD, 16f));
-    modLabel.setForeground(StyleManager.foreground_color);
 
-    if(mod != null) {
-      if(mod.format == Format.zip) {
-        modLabel.setText("<html>" + mod.name + "<font color='red'>*</html>");
-      } else {
-        modLabel.setText(mod.name);
-      }
-    }
+    versionLabel = new JLabel();
+    versionLabel.setFont(FontManager.poppins.deriveFont(Font.BOLD, 12f));
+    versionLabel.setForeground(StyleManager.foreground_color);
+    versionLabel.setPreferredSize(new Dimension(40, getPreferredSize().height));
+    
+    nameLabel = new JLabel();
+    nameLabel.setFont(FontManager.poppins.deriveFont(Font.BOLD, 16f));
+    nameLabel.setForeground(StyleManager.foreground_color);
+    nameLabel.setPreferredSize(new Dimension(593, getPreferredSize().height));
 
     toggle = new ModToggleButton(false);
     toggle.addActionListener(this);
@@ -82,7 +81,12 @@ public final class ModIndex extends RoundedPanel implements ActionListener {
       toggle.update();
     }
 
-    add(modLabel, c);
+    add(versionLabel, c);
+
+    c.insets = new Insets(0, 0, 0, 0);
+    c.gridx += 1;
+
+    add(nameLabel, c);
 
     c.weightx = 0;
     c.anchor = GridBagConstraints.EAST;
@@ -121,10 +125,19 @@ public final class ModIndex extends RoundedPanel implements ActionListener {
 
     setVisible(true);
     if(mod != null) {
-      if(mod.format == Format.zip) {
-        modLabel.setText("<html>" + mod.name + "<font color='red'>*</html>");
+      nameLabel.setText(mod.properties.getName());
+
+      if(mod.properties.getFormat() == ModFormat.zip) {
+        versionLabel.setFont(FontManager.poppins.deriveFont(Font.BOLD, 20f));
+        versionLabel.setText("<html><font color='red'>&nbsp;&nbsp;•</html>");
       } else {
-        modLabel.setText(mod.name);
+        versionLabel.setFont(FontManager.poppins.deriveFont(Font.BOLD, 12f));
+        StringBuilder labelBuilder = new StringBuilder("<html><font color='yellow'>");
+        if(mod.properties.getVersion() != null) {
+          labelBuilder.append(mod.properties.getVersion());
+        }
+        labelBuilder.append("</font></html>");
+        versionLabel.setText(labelBuilder.toString());
       }
     }
     toggle.toggled = mod.toggled;
@@ -179,7 +192,7 @@ class DragAdapter extends MouseAdapter {
     }
 
     if (targetSlot != activeSlotIndex && targetSlot < ModsListPanel.mods.size() && targetSlot >= 0) {
-      Mod movingMod = ModsListPanel.mods.remove(activeSlotIndex);
+      ModHandle movingMod = ModsListPanel.mods.remove(activeSlotIndex);
       ModsListPanel.mods.add(targetSlot, movingMod);
 
       activeSlotIndex = targetSlot;

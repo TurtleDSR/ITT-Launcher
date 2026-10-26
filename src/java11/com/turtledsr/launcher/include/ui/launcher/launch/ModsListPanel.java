@@ -14,12 +14,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import com.turtledsr.launcher.include.control.Process;
-import com.turtledsr.launcher.include.struct.Mod;
+import com.turtledsr.launcher.include.struct.ModHandle;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
 import com.turtledsr.launcher.include.ui.launcher.launch.modIndex.ModIndex;
 
 public final class ModsListPanel extends JPanel {
-  public static ArrayList<Mod> mods;
+  public static ArrayList<ModHandle> mods;
   public static ArrayList<ModIndex> modButtons;
 
   public ModsListPanel() {

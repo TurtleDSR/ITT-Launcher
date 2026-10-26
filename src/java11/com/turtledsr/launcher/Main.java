@@ -41,7 +41,7 @@ import com.turtledsr.launcher.include.engine.Logs;
 import com.turtledsr.launcher.include.engine.SingleInstanceManager;
 import com.turtledsr.launcher.include.engine.events.EventListener;
 import com.turtledsr.launcher.include.engine.events.EventManager;
-import com.turtledsr.launcher.include.struct.Mod;
+import com.turtledsr.launcher.include.struct.ModHandle;
 import com.turtledsr.launcher.include.ui.helper.FontManager;
 import com.turtledsr.launcher.include.ui.helper.ImageManager;
 import com.turtledsr.launcher.include.ui.helper.StyleManager;
@@ -190,7 +190,7 @@ public final class Main {
 
     if(Process.zipFormatPresent && !argumentPresent("-suppress_messages")) new MessageBox(
       "Zip format mods found",
-      "All mods with a <span style=\"color: 'red';\">*</span> are outdated and use the zip format. " +
+      "All mods marked with <span style=\"color: 'red';\">•</span> are outdated and use the zip format. " +
       "Either update to the newest version of the mod or ask the developer to make a hazemod port."
     );
 
@@ -507,8 +507,8 @@ public final class Main {
       yesButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
-          for (Mod m : ModsListPanel.mods) {
-            if(m.name.equals(modName)) {
+          for (ModHandle m : ModsListPanel.mods) {
+            if(m.properties.getName().equals(modName)) {
               m.toggled = true;
               Process.updateModListCache(ModsListPanel.mods);
               ModsListPanel.updateModButtonList();
