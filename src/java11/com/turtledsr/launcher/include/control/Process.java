@@ -5,10 +5,8 @@ Helper class for managing processes and similar low level machine control
 package com.turtledsr.launcher.include.control;
 
 import java.awt.Desktop;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,8 +26,6 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.swing.SwingWorker;
@@ -61,10 +57,17 @@ import com.turtledsr.hazemodlib.ModFormat;
 import com.turtledsr.hazemodlib.ModLib;
 
 public final class Process {
+  public static int LAUNCHER_NONE = 0;
+  public static int LAUNCHER_STEAM = 1;
+  public static int LAUNCHER_EA = 2;
+
+  private static int gameLauncher = LAUNCHER_NONE;
   private static String gameDirectory;
   private static String gameConfigDirectory;
-  private static String steamDirectory;
   private static String shaderCacheHash;
+
+  private static String steamDirectory;
+  private static String EADirectory;
 
   public static AtomicBoolean cleaningScripts = new AtomicBoolean(false);
   private static Object cleaningLock = new Object();
@@ -230,7 +233,10 @@ public final class Process {
             enableScriptCache();
           }
 
-          launchItTakesTwo();
+          if(!launchItTakesTwo()) {
+            Logs.logError("Failed to launch game via proxy", "PROCESS");
+            EventManager.triggerEvent("game_launch_failure");
+          }
           return null;
         }
       }.execute();
@@ -241,30 +247,57 @@ public final class Process {
   }
 
   public static boolean launchItTakesTwo() { //returns status
-    if(steamDirectory == null) getSteamDirectory();
-    String appId = "1426210";
     String[] launchArgs = {"-devmenu", "-dx12"};
-
     ArrayList<String> command = new ArrayList<>();
 
-    command.add(steamDirectory + "/steam.exe");
-    command.add("-applaunch");
-    command.add(appId);
+    if(getGameLauncher() != LAUNCHER_NONE) {
+      if(gameLauncher == LAUNCHER_STEAM) { //steam
+        String appId = "1426210";
 
-    for (String arg : launchArgs) { //add arguments
-      command.add(arg);
-    }
-    
-    try {
-      new ProcessBuilder(command).start();
+        if(steamDirectory == null) getSteamDirectory();
 
-      Logs.log("Successfully launched game", "PROCESS");
-      EventManager.triggerEvent("game_started");
-      return true;
-    } catch (Exception e) {
-      Logs.logError("Failed to launch game: " + e.getMessage(), "PROCESS");
-      return false;
+        command.add(steamDirectory + "/steam.exe");
+        command.add("-applaunch");
+        command.add(appId);
+
+        for (String arg : launchArgs) { //add arguments
+          command.add(arg);
+        }
+
+        try {
+          new ProcessBuilder(command).start();
+        
+          Logs.log("Successfully launched game", "PROCESS");
+          EventManager.triggerEvent("game_started");
+          return true;
+        } catch (Exception e) {
+          Logs.logError("Failed to launch game via Steam: " + e.getMessage(), "PROCESS");
+          return false;
+        }
+      } else { //ea
+        String appId = "16050355";
+
+        if(EADirectory == null) getEADirectory();
+
+        String encodedArgs = String.join(" ", launchArgs);
+        String launchUri = "origin2://game/launch/?offerIds=" + appId + "&cmdParams=" + encodedArgs;
+        command.add(EADirectory + "EALaunchHelper.exe");
+        command.add(launchUri);
+
+        try {
+          new ProcessBuilder(command).start();
+          
+          Logs.log("Successfully launched game", "PROCESS");
+          EventManager.triggerEvent("game_started");
+          return true;
+        } catch (Exception e) {
+          Logs.logError("Failed to launch game via EA: " + e.getMessage(), "PROCESS");
+          return false;
+        }
+      }
     }
+
+    return false;
   }
 
   public static boolean launchLivesplit(String chapter) { //returns status
@@ -284,6 +317,21 @@ public final class Process {
     }
   }
 
+  //returns which launcher the game was installed through
+  public static int getGameLauncher() {
+    gameLauncher = LAUNCHER_NONE;
+
+    if(getGameDirectory() != null) {
+      if(gameDirectory.contains("steamapps")) {
+      gameLauncher = LAUNCHER_STEAM;
+      } else {
+      gameLauncher = LAUNCHER_EA;
+      }
+    }
+
+    return gameLauncher;
+  }
+
   public static String getSteamDirectory() { //returns the directory of steam
     if(steamDirectory == null) {
       if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Wow6432Node\\Valve\\Steam")) {
@@ -296,39 +344,22 @@ public final class Process {
     return steamDirectory;
   }
 
+  public static String getEADirectory() { //returns the directory of steam
+    if(EADirectory == null) {
+      if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Electronic Arts\\EA Desktop")) {
+        EADirectory = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Electronic Arts\\EA Desktop", "InstallLocation") + "EA Desktop\\";
+      } else if(Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Electronic Arts\\EA Desktop")) {
+        EADirectory = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\WOW6432Node\\Electronic Arts\\EA Desktop", "InstallLocation") + "EA Desktop\\";
+      }
+    }
+
+    return EADirectory;
+  }
+
   public static String getGameDirectory() { //returns the directory of It Takes Two
     if(gameDirectory == null) {
-      try {
-        if(steamDirectory == null) getSteamDirectory();
-
-        List<String> libraryPaths = new ArrayList<>();
-        File vdfFile = new File(steamDirectory, "steamapps/libraryfolders.vdf");
-          
-        try(BufferedReader reader = new BufferedReader(new FileReader(vdfFile))) {
-          String line;
-          Pattern pathPattern = Pattern.compile("\"path\"\\s*\"([^\"]+)\"");
-          
-          while ((line = reader.readLine()) != null) {
-            Matcher matcher = pathPattern.matcher(line);
-            if (matcher.find()) {
-              String path = matcher.group(1).replace("\\\\", "/");
-
-              libraryPaths.add(path);
-            }
-          }
-
-          for(int i = 0; i < libraryPaths.size(); i++) {
-            gameDirectory = libraryPaths.get(i) + "/steamapps/common/ItTakesTwo/";
-            if(new File(gameDirectory).isDirectory()) {
-              return gameDirectory;
-            }
-          }
-        }
-      } catch (Exception e) {
-        Logs.logError("CANNOT READ STEAMDIR REGISTRY", "PROCESS");
-        Logs.logError(e.getMessage(), "PROCESS");
-        Main.lockQueue = true;
-        gameDirectory = null;
+      if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Hazelight\\ItTakesTwo")) {
+        gameDirectory = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Hazelight\\ItTakesTwo", "Install Dir");
       }
     }
 
@@ -663,6 +694,45 @@ public final class Process {
     }
   }
 
+  public static void ensurePermissions() {
+    File launcherDir = new File(getGameDirectory(), "Launcher/");
+    File testFile = new File(launcherDir, "test.perms");
+    boolean hasWriteAccess = false;
+
+    try {
+      if(!launcherDir.exists()) {
+        launcherDir.mkdirs();
+      }
+      if(testFile.createNewFile()) {
+        testFile.delete();
+        hasWriteAccess = true;
+      }
+    } catch(Exception e) {
+      hasWriteAccess = false;
+    }
+
+    if(!hasWriteAccess) { //request permission once
+      try {
+        if(getGameLauncher() != LAUNCHER_EA) {
+          throw new IOException("Wrong Game Launcher Found");
+        }
+
+        //use perms helper to unlock ea folder permissions
+        ProcessBuilder pb = new ProcessBuilder(
+          "powershell.exe",
+          "-NoProfile",
+          "-WindowStyle", "Normal",
+          "-Command",
+          "Start-Process perms.exe -Verb RunAs -Wait");
+        java.lang.Process p = pb.start();
+        p.waitFor();
+
+      } catch (Exception ex) {
+        Logs.logError("Failed to grant folder permissions: " + ex.getMessage(), "PROCESS");
+      }
+    }
+  }
+
   public static void writeGameConfigs() {
     GameConfigList configs = getGameConfigs();
     if(configs == null) return;
@@ -670,22 +740,22 @@ public final class Process {
     Path configDirectory = Paths.get(getGameConfigDirectory());
 
     for (String fileKey : configs.keySet()) {
-        LinkedHashMap<String, ArrayList<GameConfig>> configFile = configs.get(fileKey);
-        String fileContents = "";
-        for(String setKey : configFile.keySet()) {
-          fileContents += String.format("[/Script/Angelscript.%s]\n", setKey);
-          ArrayList<GameConfig> configSet = configFile.get(setKey);
-          for(GameConfig config : configSet) {
-            fileContents += String.format("%s=%s\n", config.identifier, config.value);
-          }
-        }
-
-        Path updateFile = configDirectory.resolve(String.format("%s.ini", fileKey));
-        try{
-          Files.writeString(updateFile, fileContents);
-        } catch(Exception e) {
-          Logs.logError(String.format("Failed to update %s: %s", updateFile.toString(), e.getLocalizedMessage()), "PROCESS");
+      LinkedHashMap<String, ArrayList<GameConfig>> configFile = configs.get(fileKey);
+      String fileContents = "";
+      for(String setKey : configFile.keySet()) {
+        fileContents += String.format("[/Script/Angelscript.%s]\n", setKey);
+        ArrayList<GameConfig> configSet = configFile.get(setKey);
+        for(GameConfig config : configSet) {
+          fileContents += String.format("%s=%s\n", config.identifier, config.value);
         }
       }
+
+      Path updateFile = configDirectory.resolve(String.format("%s.ini", fileKey));
+      try{
+        Files.writeString(updateFile, fileContents);
+      } catch(Exception e) {
+        Logs.logError(String.format("Failed to update %s: %s", updateFile.toString(), e.getLocalizedMessage()), "PROCESS");
+      }
+    }
   }
 }

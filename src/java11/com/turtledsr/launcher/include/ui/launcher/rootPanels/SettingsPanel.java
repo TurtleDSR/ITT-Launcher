@@ -32,6 +32,9 @@ public final class SettingsPanel extends AbstractRootPanel {
   private static Font categoryFont;
   private static Font inputFont;
 
+  //GAME
+  public static JLabel gameLabel;
+
   //UI
   public static JLabel uiLabel;
   public static ToggleField preservePositionField;
@@ -61,6 +64,28 @@ public final class SettingsPanel extends AbstractRootPanel {
 
     categoryFont = FontManager.poppins.deriveFont(Font.BOLD, 18f);
     inputFont = FontManager.poppins.deriveFont(10f);
+    
+    //Game Settings Section
+    c.fill = GridBagConstraints.NONE;
+    c.gridy = 0;
+    c.gridx += 1;
+
+    gameLabel = new JLabel("Game Settings:");
+    gameLabel.setForeground(StyleManager.foreground_color);
+    gameLabel.setFont(categoryFont);
+
+    add(gameLabel, c);
+    c.gridy += 1;
+
+    //seperator
+    c.gridy = 0;
+    c.gridx += 1;
+    c.fill = GridBagConstraints.VERTICAL;
+    JPanel sep = new JPanel();
+    sep.setPreferredSize(new Dimension(2, 1));
+    sep.setBackground(StyleManager.separator_color);
+    add(sep, c);
+    c.gridx += 1;
 
     //UI Settings Section
     c.fill = GridBagConstraints.NONE;
@@ -94,7 +119,7 @@ public final class SettingsPanel extends AbstractRootPanel {
     c.gridy = 0;
     c.gridx += 1;
     c.fill = GridBagConstraints.VERTICAL;
-    JPanel sep = new JPanel();
+    sep = new JPanel();
     sep.setPreferredSize(new Dimension(2, 1));
     sep.setBackground(StyleManager.separator_color);
     add(sep, c);

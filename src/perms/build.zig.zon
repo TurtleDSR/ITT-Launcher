@@ -1,0 +1,8 @@
+.{
+    .name = .perms,
+    .version = "1.0.0",
+    .dependencies = .{},
+    .minimum_zig_version = "0.17.0",
+    .paths = .{""},
+    .fingerprint = 0x7d2299b1ca63ef0c,
+}

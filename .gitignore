@@ -5,4 +5,7 @@ BUILD/
 bin/
 run.bat
 gradle.properties
-planned_features.txt
+
+#zig build stuff
+src/perms/zig-out/
+src/perms/.zig-cache/

@@ -2,7 +2,7 @@
 [group: 'build']
 [windows]
 [parallel]
-build folder=".build": shutdown-app build-J build-C 
+build folder=".build": shutdown-app build-J build-Native
   @just copy {{folder}}
   @just zip {{folder}}
 
@@ -16,7 +16,7 @@ debug:
 [group: 'build']
 [windows]
 [parallel]
-test folder=".debug": shutdown-app build-J build-C
+test folder=".debug": shutdown-app build-J build-Native
   @just copy {{folder}}
   @build/{{folder}}/ITT-launcher.exe -suppress_messages &
   @just zip {{folder}}
@@ -32,7 +32,7 @@ build-J:
 [group: 'exe']
 [windows]
 [parallel]
-build-C: build-Launch build-Update
+build-Native: build-Launch build-Update build-Perms
 
 #build c wrapper executable
 [group: 'exe']
@@ -61,6 +61,17 @@ build-Update:
 
   @#compile launch.c
   clang -O3 src/update/update.c src/update/zip.c -Isrc/update/include -o build/update/update.exe -static -lshell32
+
+#build zig update executable
+[group: 'exe']
+[windows]
+build-Perms:
+  @#create missing directories
+  @[ -d build/perms ] || mkdir -p build/perms
+
+  @#compile main.zig
+  cd src/perms && zig build -Doptimize=ReleaseSafe
+  cp src/perms/zig-out/bin/perms.exe build/perms/
 
 #update executable icon
 [group: 'exe']
@@ -100,9 +111,11 @@ copy folder=".build":
   @echo copy launch
   cp build/launch/*.exe build/{{folder}}/ &
 
-  @#copy exe
   @echo copy update
   cp build/update/*.exe build/{{folder}}/ &
+
+  @echo copy perms
+  cp build/perms/*.exe build/{{folder}}/ &
 
   @#copy dll
   @echo copy dll
