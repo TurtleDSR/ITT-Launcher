@@ -54,12 +54,12 @@ import com.turtledsr.launcher.include.ui.styled.messageBox.MessageBox;
 
 public final class Main {
   public static final String TITLE = "It Takes Two Launcher";
-  public static final String VERSION = "2.2.0";
+  public static final String VERSION = "2.2.1";
 
   public static final int RECONNECTION_INTERVAL = 500;
-  public static boolean scriptCacheEnabled = Process.getScriptCacheEnabled();
-  public static boolean lockQueue = false;
+  public static AtomicBoolean lockQueue = new AtomicBoolean(false);
   public static AtomicBoolean updating = new AtomicBoolean(false);
+  public static boolean scriptCacheEnabled = Process.getScriptCacheEnabled();
   
   public static boolean timerConnected = false;
   public static boolean gameConnected = false;

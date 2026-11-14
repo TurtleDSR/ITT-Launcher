@@ -34,7 +34,7 @@ public final class LivesplitManager {
 
     if(in == null) {
       Logs.logError("Could not find ZIP file", "LIVESPLIT_MANAGER");
-      Main.lockQueue = true;
+      Main.lockQueue.set(true);
       return;
     }
 

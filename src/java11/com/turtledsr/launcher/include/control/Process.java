@@ -5,8 +5,10 @@ Helper class for managing processes and similar low level machine control
 package com.turtledsr.launcher.include.control;
 
 import java.awt.Desktop;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +28,8 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.swing.SwingWorker;
@@ -360,6 +364,53 @@ public final class Process {
     if(gameDirectory == null) {
       if (Advapi32Util.registryKeyExists(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Hazelight\\ItTakesTwo")) {
         gameDirectory = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\Hazelight\\ItTakesTwo", "Install Dir");
+      } else {
+        //modern steam installation doesnt add install to registry so we do it here.
+        try {
+          if(steamDirectory == null) getSteamDirectory();
+          if(steamDirectory == null) throw new Exception("No steam directory found");
+
+          List<String> libraryPaths = new ArrayList<>();
+          File vdfFile = new File(steamDirectory, "steamapps/libraryfolders.vdf");
+
+          try(BufferedReader reader = new BufferedReader(new FileReader(vdfFile))) {
+            String line;
+            Pattern pathPattern = Pattern.compile("\"path\"\\s*\"([^\"]+)\"");
+
+            while ((line = reader.readLine()) != null) {
+              Matcher matcher = pathPattern.matcher(line);
+              if (matcher.find()) {
+                String path = matcher.group(1).replace("\\\\", "/");
+
+                libraryPaths.add(path);
+              }
+            }
+
+            for(int i = 0; i < libraryPaths.size(); i++) {
+              String dir = libraryPaths.get(i) + "/steamapps/common/ItTakesTwo/";
+              if(new File(dir).isDirectory()) {
+                gameDirectory = dir;
+                break;
+              }
+            }
+          }
+
+          //now that we found the game, add the path to the registry.
+          //we use perms.exe to do this for us.
+          ProcessBuilder pb = new ProcessBuilder(
+            "powershell.exe",
+            "-NoProfile",
+            "-WindowStyle", "Normal",
+            "-Command",
+            "Start-Process perms.exe -ArgumentList '--gamepath', '\"" + gameDirectory + "\"' -Verb RunAs -Wait"
+          );
+          java.lang.Process p = pb.start();
+          p.waitFor();
+
+        } catch (Exception e) {
+          Logs.logError("No game install found: " + e.getLocalizedMessage(), "PROCESS");
+          Main.lockQueue.set(true);
+        }
       }
     }
 
