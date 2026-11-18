@@ -60,7 +60,7 @@ build-Update:
   @[ -d build/tmp/update ] || mkdir -p build/tmp/update
 
   @#compile launch.c
-  clang -O3 src/update/update.c src/update/zip.c -Isrc/update/include -o build/update/update.exe -static -lshell32
+  clang -O3 src/update/update.c src/update/lib/zip.c -Isrc/update/lib -o build/update/update.exe -static -lshell32
 
 #build zig update executable
 [group: 'exe']
